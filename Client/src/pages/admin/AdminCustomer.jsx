@@ -9,7 +9,7 @@ import CreateCustomer from '../../components/modals/CreateCustomer';
 import CustomerModal from '../../components/modals/CustomerModal';
 import TransactionHistoryModal from '../../components/modals/TransactionHistoryModal';
 import { shortFormatDate } from '../../utils/FormatDate';
-import CustomerTableSkeleton from '../../components/ui/CustomerTableSkeleton';
+import SkeletonTable from '../../components/ui/SkeletonTable';
 
 const AdminCustomer = () => {
     const [customers, setCustomers] = useState([]);
@@ -253,7 +253,7 @@ const AdminCustomer = () => {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {customersLoading ? (
-                                    <CustomerTableSkeleton rows={8} />
+                                    <SkeletonTable rows={8} columns={6} />
                                 ) : customers.length === 0 ? (
                                     <tr>
                                         <td colSpan="6" className="text-center py-16">
