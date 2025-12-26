@@ -59,7 +59,6 @@ exports.createStaff = async (req, res) => {
     }
 };
 
-
 exports.getAllStaff = async (req, res) => {
     try {
         const staff = await Staff.find()
