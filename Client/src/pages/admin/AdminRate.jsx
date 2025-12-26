@@ -9,22 +9,20 @@ import { formatDate } from "../../utils/FormatDate";
 const AdminRate = () => {
     const [interestRates, setInterestRates] = useState([]);
     const [scheduleRates, setScheduleRates] = useState([]);
-
     const [selectedRate, setSelectedRate] = useState(null);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
-
     const [showModal, setShowModal] = useState(false);
     const [formType, setFormType] = useState("");
     const [form, setForm] = useState({});
     const [editId, setEditId] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    /* ================= FETCH ================= */
     const fetchRates = async () => {
         try {
-            const res = await axios.get("/rate/interest", { withCredentials: true });
+            const res = await axios.get("/rate/interest", { 
+                withCredentials: true 
+            });
             setInterestRates(res.data.rates || []);
-
             const currentRes = await axios.get("/rate/current", { withCredentials: true });
             if (currentRes.data.currentSchedule) {
                 setScheduleRates([currentRes.data.currentSchedule]);
@@ -37,10 +35,12 @@ const AdminRate = () => {
     };
 
     useEffect(() => {
-        fetchRates();
+        const fetchData = () => {
+            fetchRates()
+        }
+        fetchData()
     }, []);
 
-    /* ================= SUBMIT ================= */
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -73,9 +73,6 @@ const AdminRate = () => {
         setLoading(false);
     };
 
-    /* ================= HANDLERS ================= */
-
-    // Monthly
     const handleAddMonthly = () => {
         setFormType("Monthly Rate");
         setForm({ rate: "", effectivityDate: "" });

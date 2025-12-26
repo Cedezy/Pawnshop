@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { formatDate } from "../../utils/FormatDate";
 import { getStatusClass } from "../../utils/UserStatus";
+import { X, CreditCard } from 'lucide-react';
 
 const CustomerModal = ({ isOpen, onClose, selectedUser, fetchTransactionHistory }) => {
     const [isIdOpen, setIsIdOpen] = useState(false);
@@ -141,13 +142,48 @@ const CustomerModal = ({ isOpen, onClose, selectedUser, fetchTransactionHistory 
                         Close
                     </button>
                 </div>
+            </div>
+            {isIdOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 p-4">
+                    <div className="bg-white rounded-sm shadow-md max-w-3xl w-full overflow-hidden animate-fade-in duration-200">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-linear-to-r from-gray-50 to-white">
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
+                                    <CreditCard className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 text-lg">
+                                        Identification Document
+                                    </h3>
+                                </div>
+                            </div>
+                            
+                            <button onClick={() => setIsIdOpen(false)}
+                                className="text-gray-400 hover:text-gray-600 transition-colors rounded-lg p-2 hover:bg-gray-100"
+                                aria-label="Close modal">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
 
-                {isIdOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-                        <div className="bg-white p-4 rounded shadow-lg max-w-md w-full animate-fade-in">
-                            <h3 className="font-medium mb-2 text-gray-700">Identification</h3>
-                            <img src={idPhotoUrl} alt="ID Photo" className="w-full object-contain rounded" />
-                            <div className="flex justify-end mt-4">
+                        {/* Image Container */}
+                        <div className="p-6 bg-gray-50">
+                            <div className="relative bg-white rounded-lg shadow-inner border-2 border-gray-200 overflow-hidden">
+                            
+                                <img 
+                                    src={idPhotoUrl} 
+                                    alt="Identification Document" 
+                                    className="w-full object-contain max-h-[60vh] transition-opacity duration-300"
+
+                                />
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 px-6 py-4 bg-white border-t border-gray-200">
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span>Verified Document</span>
+                            </div>
+                            
+                            <div className="flex gap-2">
                                 <button
                                     onClick={() => setIsIdOpen(false)}
                                     className="px-5 py-2 border-2 border-gray-300 text-gray-700 rounded-sm cursor-pointer hover:bg-gray-100 ease-in-out duration-300 font-medium text-sm"
@@ -157,8 +193,8 @@ const CustomerModal = ({ isOpen, onClose, selectedUser, fetchTransactionHistory 
                             </div>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };
