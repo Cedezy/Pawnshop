@@ -126,46 +126,45 @@ const AdminRate = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-10">
-                        {/* ================= MONTHLY RATE ================= */}
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-700">Monthly Rate</h2>
-                            <p className="text-sm text-gray-500 mb-3">
-                                Monthly interest rates applied to loans.
-                            </p>
-
-                            <div className="bg-white border rounded-sm shadow-sm overflow-y-auto">
-                                <table className="min-w-full divide-y">
-                                    <thead className="bg-gray-50 sticky top-0">
+                            <h2 className="text-lg font-semibold text-gray-700 mb-2">Monthly Rate</h2>
+                            <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-100 sticky top-0 z-10">
                                         <tr>
-                                            <th className="px-6 py-4 text-xs text-left uppercase text-gray-500">
+                                            <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                                 Rate (%)
                                             </th>
-                                            <th className="px-6 py-4 text-xs text-left uppercase text-gray-500">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">
                                                 Effectivity Date
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y">
+                                    <tbody className="bg-white divide-y divide-gray-200">
                                         {interestRates.length === 0 ? (
                                             <tr>
-                                                <td colSpan="2" className="py-16 text-center">
-                                                    <HelpCircle className="mx-auto mb-3 text-gray-400" />
-                                                    <p className="text-gray-500">No Monthly Rates yet</p>
+                                                <td colSpan="2" className="text-center py-16">
+                                                    <div className="flex flex-col items-center">
+                                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                            <HelpCircle className="w-8 h-8 text-gray-400" />                             
+                                                        </div>
+                                                        <p className="text-gray-500">No Monthly Rates yet.</p>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ) : (
                                             interestRates.map(r => (
-                                                <tr
-                                                    key={r._id}
+                                                <tr key={r._id}
                                                     onClick={() => setSelectedRate(r)}
                                                     className={`cursor-pointer ${
                                                         selectedRate?._id === r._id
                                                             ? "bg-green-100"
-                                                            : "hover:bg-gray-100"
-                                                    }`}
-                                                >
-                                                    <td className="px-6 py-4">{r.rate}%</td>
-                                                    <td className="px-6 py-4">
+                                                            : "hover:bg-gray-100 ease-in-out duration-300"
+                                                    }`}>
+                                                    <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
+                                                        {r.rate}%
+                                                    </td>
+                                                    <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
                                                         {formatDate(r.effectivityDate)}
                                                     </td>
                                                 </tr>
@@ -173,90 +172,113 @@ const AdminRate = () => {
                                         )}
                                     </tbody>
                                 </table>
+                                <div className="px-6 py-4 border-t border-gray-300 bg-gray-50 text-sm text-gray-700">
+                                    <p>
+                                        Monthly rates are applied to all active pawn loans.
+                                    </p>
+                                    <p className="mt-1">
+                                        Changes affect new transactions only.
+                                    </p>
+                                </div>
+
                             </div>
 
                             <div className="flex gap-2 mt-3">
-                                <button onClick={handleAddMonthly} className="btn-outline">
-                                    ADD
+                                <button onClick={handleAddMonthly} className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300">
+                                    Add
                                 </button>
                                 <button
                                     onClick={handleEditMonthly}
                                     disabled={!selectedRate}
-                                    className="btn-outline disabled:opacity-50"
-                                >
-                                    EDIT
+                                    className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 cursor-pointer ease-in-out duration-300">
+                                    Edit
                                 </button>
                             </div>
                         </div>
 
-                        {/* ================= SCHEDULE RATE ================= */}
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-700">
+                            <h2 className="text-lg font-semibold text-gray-700 mb-2">
                                 Payment Schedule Rate
                             </h2>
-                            <p className="text-sm text-gray-500 mb-3">
-                                Rates based on payment schedule.
-                            </p>
-
-                            <div className="bg-white border rounded-sm shadow-sm overflow-y-auto">
-                                <table className="min-w-full divide-y">
-                                    <thead className="bg-gray-50 sticky top-0">
+                            <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-100 sticky top-0 z-10">
                                         <tr>
-                                            <th className="px-6 py-4 text-xs uppercase text-left">Effectivity</th>
-                                            <th className="px-6 py-4 text-xs uppercase text-left">1st (%)</th>
-                                            <th className="px-6 py-4 text-xs uppercase text-left">2nd (%)</th>
-                                            <th className="px-6 py-4 text-xs uppercase text-left">3rd (%)</th>
+                                            <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
+                                                Effectivity
+                                            </th>
+                                            <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
+                                                1st (%)
+                                            </th>
+                                            <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
+                                                2nd (%)
+                                            </th>
+                                            <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
+                                                3rd (%)
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
                                         {scheduleRates.length === 0 ? (
-                                            <tr>
-                                                <td colSpan="4" className="py-16 text-center">
-                                                    <HelpCircle className="mx-auto mb-3 text-gray-400" />
-                                                    <p className="text-gray-500">No Schedule Rates yet</p>
-                                                </td>
-                                            </tr>
+                                            <td colSpan="4" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <HelpCircle className="w-8 h-8 text-gray-400" />
+                                                    </div>
+                                                    <p className="text-gray-500">No Schedule Rates yet.</p>
+                                                </div>
+                                            </td>
                                         ) : (
                                             scheduleRates.map(s => (
-                                                <tr
-                                                    key={s._id}
+                                                <tr key={s._id}
                                                     onClick={() => setSelectedSchedule(s)}
                                                     className={`cursor-pointer ${
                                                         selectedSchedule?._id === s._id
                                                             ? "bg-green-100"
-                                                            : "hover:bg-gray-100"
-                                                    }`}
-                                                >
-                                                    <td className="px-6 py-4">
+                                                            : "hover:bg-gray-100 ease-in-out duration-300"
+                                                    }`}>
+                                                    <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
                                                         {formatDate(s.effectivityDate)}
                                                     </td>
-                                                    <td className="px-6 py-4">{s.firstSchedule}%</td>
-                                                    <td className="px-6 py-4">{s.secondSchedule}%</td>
-                                                    <td className="px-6 py-4">{s.thirdSchedule}%</td>
+                                                    <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
+                                                        {s.firstSchedule}%
+                                                    </td>
+                                                    <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
+                                                        {s.secondSchedule}%
+                                                    </td>
+                                                    <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
+                                                        {s.thirdSchedule}%
+                                                    </td>
                                                 </tr>
                                             ))
                                         )}
                                     </tbody>
                                 </table>
+                                <div className="px-6 py-4 border-t border-gray-300 bg-gray-50 text-sm text-gray-700">
+                                    <p>
+                                        Schedule rates depend on the selected payment period.
+                                    </p>
+                                    <p className="mt-1">
+                                        Only one schedule rate can be active at a time.
+                                    </p>
+                                </div>
                             </div>
 
-                            <div className="flex gap-2 mt-3">
-                                <button onClick={handleAddSchedule} className="btn-outline">
-                                    ADD
+                             <div className="flex gap-2 mt-3">
+                                <button onClick={handleAddSchedule} className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300">
+                                    Add
                                 </button>
                                 <button
                                     onClick={handleEditSchedule}
                                     disabled={!selectedSchedule}
-                                    className="btn-outline disabled:opacity-50"
-                                >
-                                    EDIT
+                                    className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 cursor-pointer ease-in-out duration-300">
+                                    Edit
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* ================= MODAL ================= */}
                 {showModal && (
                     <RateModal
                         type={formType}

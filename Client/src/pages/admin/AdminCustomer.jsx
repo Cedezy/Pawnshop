@@ -230,7 +230,7 @@ const AdminCustomer = () => {
                         <h1 className="print-title hidden">List of Customers</h1>
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-100 sticky top-0 z-10">
-                                <tr>
+                                <tr className='whitespace-nowrap'>
                                     <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
                                         Customer ID
                                     </th>

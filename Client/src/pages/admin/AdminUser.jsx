@@ -96,7 +96,7 @@ const AdminUser = () => {
                                 <tr>
                                     <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase">Name</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Email</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Role</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">User Type</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Contact Number</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Address</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Last Login</th>
