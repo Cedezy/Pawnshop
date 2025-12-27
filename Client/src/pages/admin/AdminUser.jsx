@@ -15,6 +15,7 @@ const AdminUser = () => {
     const [admin, setAdmin] = useState(null);
     const [confirmAction, setConfirmAction] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
     const printRef = useRef();
     const { showToast } = useToast();
 
@@ -57,6 +58,7 @@ const AdminUser = () => {
     const handleDeactivateReactivate = async () => {
         if(!selectedStaff) return;
 
+        setActionLoading(true);
         const userId = selectedStaff.userId._id;
         try{
             let response;
@@ -67,12 +69,15 @@ const AdminUser = () => {
             else{
                 response = await axios.put(`/user/${userId}/reactivate`);
             }
-            showToast("Success", response.data.message, "success");
             fetchStaff();
             setSelectedStaff(null);
+            showToast("Success", response.data.message, "success");
         } 
         catch(err){
             console.error(err);
+        }
+        finally{
+            setActionLoading(false);
         }
     };
 
@@ -188,13 +193,47 @@ const AdminUser = () => {
                                 Add
                             </button>
                             <button
-                                disabled={!selectedStaff}
-                                onClick={() => setConfirmAction(true)} // open confirmation modal
-                                className={`px-5 py-2.5 text-sm font-medium rounded-sm ${selectedStaff ? (selectedStaff.userId.isActive ? 'bg-red-500 text-white' : 'bg-green-500 text-white') : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
+                                disabled={actionLoading}
+                                onClick={async () => {
+                                    await handleDeactivateReactivate();
+                                    setConfirmAction(false);
+                                }}
+                                className={`px-4 py-2 text-sm rounded-sm flex items-center justify-center gap-2 text-white
+                                    ${actionLoading
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : selectedStaff.userId.isActive
+                                            ? 'bg-red-500 hover:bg-red-600'
+                                            : 'bg-green-500 hover:bg-green-600'
+                                    }
+                                `}
                             >
-                                {selectedStaff ? (selectedStaff.userId.isActive ? 'Deactivate' : 'Reactivate') : 'Select Staff'}
+                                {actionLoading ? (
+                                    <>
+                                        <svg
+                                            className="w-4 h-4 animate-spin"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            />
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                            />
+                                        </svg>
+                                        Processing...
+                                    </>
+                                ) : (
+                                    selectedStaff.userId.isActive ? 'Deactivate' : 'Reactivate'
+                                )}
                             </button>
-
                         </div>
 
                         <button
