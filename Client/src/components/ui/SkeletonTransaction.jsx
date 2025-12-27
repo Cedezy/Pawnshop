@@ -1,6 +1,6 @@
 import React from "react";
 
-const SkeletonTransaction = ({ pawnItems = 2, actionsPerPawn = 3 }) => {
+const SkeletonTransaction = ({ pawnItems = 1, actionsPerPawn = 3 }) => {
     return (
         <div className="overflow-y-auto flex-1">
             <div className="space-y-8 animate-pulse">
