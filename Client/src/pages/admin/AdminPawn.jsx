@@ -527,7 +527,7 @@ const AdminPawn = () => {
                         <div className='flex gap-2'>
                             <button 
                                 onClick={() => setIsCreatePawnOpen(true)}
-                                className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 hover:border-gray-400'
+                                className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                             >
                                 Add
                             </button>
@@ -536,7 +536,7 @@ const AdminPawn = () => {
 
                                 <button
                                     onClick={handleRedeem}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
+                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                                     disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
                                     style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
                                 >
@@ -545,7 +545,7 @@ const AdminPawn = () => {
 
                                 <button     
                                     onClick={handleRenew}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
+                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                                     disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
                                     style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
                                 >
@@ -554,7 +554,7 @@ const AdminPawn = () => {
 
                                 <button 
                                     onClick={handlePayment}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
+                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                                     disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
                                     style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
                                 >

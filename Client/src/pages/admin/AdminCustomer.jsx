@@ -64,13 +64,15 @@ const AdminCustomer = () => {
     },[]);   
 
     const handleTransactionHistory = async (user) => {
+        setTransactionHistory([]); 
+        setShowHistoryModal(true); 
+
         try{
             const response = await axios.get(`/customer/${user._id}/transactions`, { 
                 withCredentials: true 
             });
             setTransactionHistory(response.data.transactionHistory || []);
             setShowModal(false); 
-            setShowHistoryModal(true); 
         } 
         catch (err) {
             console.error(err);
