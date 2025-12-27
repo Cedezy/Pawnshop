@@ -4,6 +4,7 @@ import axios from "../../api/axios";
 import { formatCurrency } from "../../utils/FormatCurrency";
 import { shortFormatDate } from "../../utils/FormatDate";
 import ReceiptModal from "../../components/modals/ReceiptModal";
+import SkeletonCustomerPawn from '../../components/ui/SkeletonCustomerPawn';
 import { Inbox } from "lucide-react";
 
 const CustomerPawn = () => {
@@ -55,9 +56,7 @@ const CustomerPawn = () => {
                     </div>
 
                     {loading ? (
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 flex justify-center">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-                        </div>
+                        <SkeletonCustomerPawn/>
                     ) : pawns.length === 0 ? (
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center text-gray-500">
                             <Inbox className="w-12 h-12 mx-auto mb-4" />
