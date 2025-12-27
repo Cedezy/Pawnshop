@@ -26,7 +26,7 @@ const SidebarAdmin = () => {
     const location = useLocation(); 
     const { showToast } = useToast();
 
-     const handleSignOut = async () => {
+    const handleSignOut = async () => {
         try {
             await axios.post('/auth/logout', {}, { withCredentials: true });
             showToast("Success", "Logged out successfully!", "success");
@@ -92,12 +92,10 @@ const SidebarAdmin = () => {
                     onClick={navigate}
                 />
 
-                {/* Account Settings */}
                 <div className="pt-2">
                     <button 
                         onClick={() => setOpenAccount(!openAccount)}
-                        className="flex items-center text-sm justify-between w-full px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-200 group"
-                    >
+                        className="flex items-center text-sm justify-between w-full px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-200 group">
                         <div className="flex items-center gap-3">
                             <Settings size={20} className="text-gray-500 group-hover:text-yellow-600 transition-colors" />
                             <span className="font-medium text-gray-700 group-hover:text-yellow-600">Account Settings</span>
@@ -126,7 +124,6 @@ const SidebarAdmin = () => {
                         </div>
                     )}
                 </div>
-
                 <div className="pt-2">
                     <button 
                         onClick={() => setOpenSystem(!openSystem)}
@@ -165,9 +162,7 @@ const SidebarAdmin = () => {
                         </div>
                     )}
                 </div>
-
             </nav>
-
             <div className="px-4 py-4 border-t border-gray-200">
                 <p className="text-xs text-gray-7   00 text-center">© 2025 Pawnshop System</p>
             </div>
@@ -196,12 +191,9 @@ const SidebarAdmin = () => {
                             </button>
                         </div>
 
-                        {/* Content */}
                         <p className="text-gray-600 mb-6 leading-relaxed">
                             Are you sure you want to sign out of your account? You'll need to log in again to access your data.
                         </p>
-
-                        {/* Action buttons */}
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setShowLogoutModal(false)}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import SidebarManager from "../../components/ui/SidebarManager";
 import HeaderStaff from "../../components/ui/HeaderStaff";
 import axios from "../../api/axios";
+import SkeletonContact from "../../components/ui/SkeletonContact";
 
 const ManagerContact = () => {
     const [contact, setContact] = useState({});
@@ -9,14 +10,16 @@ const ManagerContact = () => {
 
     useEffect(() => {
         const fetchContactInfo = async () => {
-            try {
+            try{
                 const response = await axios.get("/contactUs");
-                if (response.data) {
+                if(response.data){
                     setContact(response.data);
                 }
-            } catch (error) {
+            } 
+            catch(error){
                 console.error("Failed to load contact info", error);
-            } finally {
+            } 
+            finally {
                 setLoading(false);
             }
         };
@@ -44,22 +47,19 @@ const ManagerContact = () => {
                             CONTACT US
                         </span>
                     </div>
-
-                    <div className="bg-white rounded-sm shadow-sm overflow-y-auto">
-                        <div className="bg-gray-50 border-b border-gray-200 px-6 py-4 text-gray-800">
-                            <h2 className="text-lg font-medium">
-                                Pawnshop Contact Information
-                            </h2>
-                            <p className="text-sm opacity-90">
-                                Public contact details of the pawnshop
-                            </p>
-                        </div>
-
-                        {/* Body */}
-                        <div className="px-8 py-6">
-                            {loading ? (
-                                <p>Loading...</p>
-                            ) : (
+                    {loading ? (
+                        <SkeletonContact/>
+                    ) : (
+                        <div className="bg-white rounded-sm shadow-sm overflow-y-auto">
+                            <div className="bg-gray-50 border-b border-gray-200 px-6 py-4 text-gray-800">
+                                <h2 className="text-lg font-medium">
+                                    Pawnshop Contact Information
+                                </h2>
+                                <p className="text-sm opacity-90">
+                                    Public contact details of the pawnshop
+                                </p>
+                            </div>
+                            <div className="px-8 py-6">               
                                 <>
                                     <div className="mb-10">
                                         <h3 className="text-gray-600 font-semibold mb-4 pb-2 border-b border-gray-300">
@@ -95,14 +95,12 @@ const ManagerContact = () => {
                                         </div>
                                     </div>
                                 </>
-                            )}
+                            </div>
+                            <div className="px-6 py-4 border-t border-gray-300 bg-gray-50 text-sm text-gray-500">
+                                These details are visible on the system’s “Contact Us” section.
+                            </div>
                         </div>
-
-                        {/* Footer */}
-                        <div className="px-6 py-4 border-t border-gray-300 bg-gray-50 text-sm text-gray-500">
-                            These details are visible on the system’s “Contact Us” section.
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

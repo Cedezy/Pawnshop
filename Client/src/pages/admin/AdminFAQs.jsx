@@ -87,43 +87,43 @@ const AdminFAQs = () => {
                         <SkeletonFAQs/>
                     ) : (
                         <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50 sticky top-0 z-10">
-                                <tr className='whitespace-nowrap'>
-                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-500 uppercase">Question</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Answer</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created At</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Updated at</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {faqs.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="5" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <HelpCircle className="w-8 h-8 text-gray-400" />
-                                                </div>
-                                                <h3 className="text-lg font-medium text-gray-900 mb-2">No FAQs yet</h3>
-                                                <p className="text-gray-500">Create some common questions to help your users.</p>
-                                            </div>
-                                        </td>
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50 sticky top-0 z-10">
+                                    <tr className='whitespace-nowrap'>
+                                        <th className="px-6 py-6 text-left text-xs font-medium text-gray-500 uppercase">Question</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Answer</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created At</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Updated at</th>
                                     </tr>
-                                ) : (
-                                    faqs.map((faq) => (
-                                        <tr key={faq._id}
-                                            onClick={() => setSelectedFaqs(faq)}
-                                            className={`cursor-pointer transition ${selectedFaqs?._id === faq._id ? 'bg-green-100' : 'hover:bg-gray-100 duration-300'}`}>
-                                            <td className="px-6 py-6 text-sm">{faq.question}</td>
-                                            <td className="px-6 py-4 text-sm">{faq.answer}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(faq.createdAt)}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(faq.updatedAt)}</td>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {faqs.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <HelpCircle className="w-8 h-8 text-gray-400" />
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No FAQs yet</h3>
+                                                    <p className="text-gray-500">Create some common questions to help your users.</p>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                    ) : (
+                                        faqs.map((faq) => (
+                                            <tr key={faq._id}
+                                                onClick={() => setSelectedFaqs(faq)}
+                                                className={`cursor-pointer transition ${selectedFaqs?._id === faq._id ? 'bg-green-100' : 'hover:bg-gray-100 duration-300'}`}>
+                                                <td className="px-6 py-6 text-sm">{faq.question}</td>
+                                                <td className="px-6 py-4 text-sm">{faq.answer}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(faq.createdAt)}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(faq.updatedAt)}</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                     <div className='flex gap-2'>
                         <button onClick={() => setShowModal(true)}

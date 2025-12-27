@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
     ChevronDown, 
@@ -8,21 +8,22 @@ import {
     Info,
     Mail,
     HelpCircle,
-    Settings,
     User,
-    UserCog,
     Sliders,
-    LogOut 
+    LogOut,
+    X
 } from "lucide-react";
 import { useToast } from "../../context/ToastContext"; 
 import axios from "../../api/axios";
 
 const SidebarManager = () => {
+    const [openSystem, setOpenSystem] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const navigate = useNavigate();
     const location = useLocation(); 
     const { showToast } = useToast();
 
-     const handleSignOut = async () => {
+    const handleSignOut = async () => {
         try {
             await axios.post('/auth/logout', {}, { withCredentials: true });
             showToast("Success", "Logged out successfully!", "success");
@@ -43,8 +44,8 @@ const SidebarManager = () => {
                 <h1 className="text-xl font-bold mt-3 text-yellow-600">Manager Panel</h1>
                 <p className="text-xs text-gray-500 mt-1">Pawnshop Management</p>
                 <button
-                    onClick={handleSignOut} 
-                    className="mt-2 flex items-center gap-2 text-sm cursor-pointer bg-gray-100 text-gray-900 py-2 px-6 rounded-md hover:bg-gray-200 transition-all duration-300"
+                    onClick={() => setShowLogoutModal(true)}
+                    className="mt-2 flex items-center gap-2 text-sm cursor-pointer bg-gray-200 text-gray-900 py-2 px-6 rounded-md hover:bg-gray-300 transition-all duration-300"
                 >
                     <LogOut size={16} />
                     Sign out
@@ -95,19 +96,98 @@ const SidebarManager = () => {
                     onClick={navigate}
                 />
 
-                <SidebarItem 
-                    icon={Sliders} 
-                    label="System Settings" 
-                    to="/manager/rate"
-                    isActive={location.pathname === "/manager/system-settings"}
-                    onClick={navigate}
-                />
+                <div className="pt-2">
+                    <button 
+                        onClick={() => setOpenSystem(!openSystem)}
+                        className="flex items-center text-sm justify-between w-full px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-200 group"
+                    >
+                        <div className="flex items-center gap-3">
+                            <Sliders size={20} className="text-gray-500 group-hover:text-yellow-600 transition-colors" />
+                            <span className="font-medium text-gray-700 group-hover:text-yellow-600">
+                                System Settings
+                            </span>
+                        </div>
+                        {openSystem 
+                            ? <ChevronDown size={18} className="text-gray-500" /> 
+                            : <ChevronRight size={18} className="text-gray-500" />
+                        }
+                    </button>
+
+                    {openSystem && (
+                        <div className="ml-6 mt-2 space-y-1 border-l-2 border-gray-200 pl-2">
+                            <SidebarItem 
+                                icon={Coins} 
+                                label="Rates & Charges" 
+                                to="/manager/rate"
+                                isActive={location.pathname === "/manager/rate"}
+                                onClick={navigate}
+                                small
+                            />
+                            <SidebarItem 
+                                icon={Info} 
+                                label="Gallery" 
+                                to="/manager/gallery"
+                                isActive={location.pathname === "/manager/gallery"}
+                                onClick={navigate}
+                                small
+                            />
+                        </div>
+                    )}
+                </div>
             </nav>
 
-            {/* Footer */}
             <div className="px-4 py-4 border-t border-gray-200">
                 <p className="text-xs text-gray-400 text-center">© 2025 Pawnshop System</p>
             </div>
+
+            {showLogoutModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+                    <div  className="bg-white rounded-sm shadow-md w-full max-w-md p-6 animate-fade-in"
+                        onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-50">
+                                    <LogOut className="w-6 h-6 text-red-600" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-semibold text-gray-900">
+                                        Sign Out
+                                    </h2>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowLogoutModal(false)}
+                                className="text-gray-400 hover:text-gray-600 transition-colors rounded-lg p-1 hover:bg-gray-100"
+                                aria-label="Close modal"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <p className="text-gray-600 mb-6 leading-relaxed">
+                            Are you sure you want to sign out of your account? You'll need to log in again to access your data.
+                        </p>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowLogoutModal(false)}
+                                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-sm shadow-sm cursor-pointer bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 ease-in-out duration-300"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setShowLogoutModal(false);
+                                    handleSignOut();
+                                }}
+                                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-sm bg-red-600 cursor-pointer text-white hover:bg-red-700 active:bg-red-800 ease-in-out duration-300 shadow-sm"
+                            >
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </aside>
     );
 };

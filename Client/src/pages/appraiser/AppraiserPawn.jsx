@@ -8,6 +8,7 @@ import PawnDetailModal from "../../components/modals/PawnDetailModal";
 import PawnUpdateModal from "../../components/modals/PawnUpdateModal";
 import PawnSuccessModal from "../../components/modals/PawnSuccessModal";
 import ReceiptModal from "../../components/modals/ReceiptModal";
+import SkeletonTable from "../../components/ui/SkeletonTable";
 import { shortFormatDate } from "../../utils/FormatDate";
 import { formatCurrency } from "../../utils/FormatCurrency";
 import { useRef } from 'react';
@@ -17,7 +18,7 @@ import { UserX, Printer, Search } from "lucide-react";
 const AppraiserPawn = () => {
     const [customers, setCustomers] = useState([]);
     const [pawns, setPawns] = useState([]);
-    const [manager, SetManager] = useState(null);
+    const [appraiser, setAppraiser] = useState(null);
     const [search, setSearch] = useState("");
     const [filterType, setFilterType] = useState("All"); 
     const [filteredPawns, setFilteredPawns] = useState([]);
@@ -31,7 +32,9 @@ const AppraiserPawn = () => {
     const [receipt, setReceipt] = useState(null);
     const [showRedeemModal, setShowRedeemModal] = useState(false);
     const [showRenewModal, setShowRenewModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+    const [pawnLoading, setPawnLoading] = useState(true);
     const [successConfig, setSuccessConfig] = useState({
         open: false,
         title: "",
@@ -40,18 +43,18 @@ const AppraiserPawn = () => {
     const printRef = useRef();
 
     useEffect(() => {
-        const fetchManagerData = async () => {
+        const fetchAdminData = async () => {
             try{
                 const response = await axios.get('user/me', {
                     withCredentials: true
                 });
-                SetManager(response.data.user)
+                setAppraiser(response.data.user)
             }
             catch(err){
                 console.log(err);
             }
         }
-        fetchManagerData();
+        fetchAdminData();
     }, []);
 
     const fetchCustomers = async () => {
@@ -77,6 +80,9 @@ const AppraiserPawn = () => {
         catch(err){
             console.error("Error fetching pawns:", err);
         }
+        finally{
+            setPawnLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -92,13 +98,13 @@ const AppraiserPawn = () => {
             const response = await axios.post("/pawn", data, { 
                 withCredentials: true 
             });
+            fetchPawns(); 
             setIsCreatePawnOpen(false); 
             openSuccessWithReceipt(
                 response.data.receipt,
                 "Pawn Created Successfully!",
                 "The pawn transaction has been recorded in the system."
-            );   
-            fetchPawns();       
+            );         
         } 
         catch(err){
             console.log("Failed to create pawn.", err);
@@ -115,15 +121,15 @@ const AppraiserPawn = () => {
             const response = await axios.post(`/pawn/${selectedPawn._id}/redeem`, {
                 withCredentials: true
             });
+            fetchPawns();
+            setSelectedPawn(null);
+            setShowRedeemModal(false);
+            setSelectedPawn(null);
             openSuccessWithReceipt(
                 response.data.receipt,
                 "Pawn Redeemed Successfully",
                 "The pawn has been redeemed."
             );
-            fetchPawns();
-            setSelectedPawn(null);
-            setShowRedeemModal(false);
-            setSelectedPawn(null);
         } 
         catch (error) {
             console.error(error);
@@ -140,51 +146,43 @@ const AppraiserPawn = () => {
             const response = await axios.post(`/pawn/${selectedPawn._id}/renew`, {
                 withCredentials: true
             });
+            fetchPawns();
+            setSelectedPawn(null);
+            setShowRenewModal(false);
+            setSelectedPawn(null);
             openSuccessWithReceipt(
                 response.data.receipt,
                 "Pawn Renewed Successfully",
                 "The pawn has been renewed."
             );
-            fetchPawns();
-            setSelectedPawn(null);
-            setShowRenewModal(false);
-            setSelectedPawn(null);
         } 
-        catch (error) {
+        catch(error){
             console.error(error);
         }
     };
 
-    const handlePayment = async () => {
+    const handlePayment = () => {
         if (!selectedPawn) return;
+        setShowPaymentModal(true); 
+    };
 
-        const input = prompt("Enter payment amount:");
-        if (!input) return;
-
-        const amount = parseFloat(input);
-        if (isNaN(amount) || amount <= 0) {
-            alert("Invalid amount");
-            return;
-        }
-
-        if (selectedPawn.interestBalance <= 0) {
-            alert("No interest due to pay at the moment. Try Renew or Redeem instead.");
-            return;
-        }
-
-
+    const handleConfirmPayment = async ({ amountPaid, paymentMethod}) => {
         try {
-            const res = await axios.post(`/pawn/${selectedPawn._id}/payment`, {
-                amount
+            const response = await axios.post(`/pawn/${selectedPawn._id}/payment`, {
+                amount: amountPaid,
+                paymentMethod, 
             }, { withCredentials: true });
             fetchPawns();
             setSelectedPawn(null);
+            setShowRenewModal(false);
+            setSelectedPawn(null);
             openSuccessWithReceipt(
-                res.data.receipt,
+                response.data.receipt,
                 "Payment Recorded Successfully!",
-                "The interest payment has been saved."
+                "The principal payment has been saved."
             );
-        } catch (err) {
+        } 
+        catch(err){
             console.error(err);
             alert("Failed to add payment.");
         }
@@ -293,7 +291,6 @@ const AppraiserPawn = () => {
 
     return (
         <div className="flex h-screen overflow-hidden">
-           
             <SidebarAppraiser/>  
             <div className="flex flex-col flex-1">
                 <HeaderStaff/>
@@ -389,15 +386,15 @@ const AppraiserPawn = () => {
 
                     </div>
 
-                    <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
+                    <div ref={printRef} className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
                         <h1 className="print-title hidden">List of Pawns</h1>
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-100 sticky top-0 z-10">
                                 <tr className="whitespace-nowrap">
-                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
+                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         PAWN ID
                                     </th>
-                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
+                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Customer Name
                                     </th>
                                     <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
@@ -406,13 +403,16 @@ const AppraiserPawn = () => {
                                     <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Loan Amount
                                     </th>
-                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
+                                        Balance
+                                    </th>
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Start Date
                                     </th>
-                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900e uppercase whitespace-nowrap">
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900e uppercase">
                                         Maturity Date
                                     </th>
-                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Expiry Date
                                     </th>
                                     <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
@@ -421,95 +421,103 @@ const AppraiserPawn = () => {
                                 </tr>
                             </thead>
 
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {pawns.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="8" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
+                            {pawnLoading ? (
+                                <SkeletonTable rows={8} columns={9} />
+                            ) : (
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {pawns.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No pawns yet!</h3>
+                                                    <p className="text-gray-500">Pawns will appear here once they submit a request.</p>
                                                 </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No pawns yet!</h3>
-                                                <p className="text-gray-500">Pawns will appear here once they submit a request.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : filteredPawns.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="8" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
-                                                </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
-                                                <p className="text-gray-500">Try adjusting your search keywords.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredPawns.map((p) => (
-                                        <tr
-                                            key={p._id}
-                                            className={`transition ease-in-out duration-300 ${
-                                                selectedPawn?._id === p._id ? "bg-yellow-100" : ""
-                                            } ${p.status === "Redeemed" ? "cursor-pointer hover:bg-gray-50" : "cursor-pointer hover:bg-gray-50"}`}
-                                            onClick={() => {
-                                                if (p.status !== "Redeemed") {
-                                                setSelectedPawn(p);
-                                                }
-                                            }}
-                                            onDoubleClick={() => setDetailPawn(p)}
-                                        >
-                                            <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold whitespace-nowrap">
-                                                PAWN-{p._id.slice(-6).toUpperCase()}
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {p.customerId?.userId?.firstname} {p.customerId?.userId?.lastname}
-                                            </td>
-
-                                            <td className="px-6 py-6 text-sm text-gray-800">
-                                                {p.itemName}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                                                {formatCurrency(p.loanAmount)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.startDate)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.maturityDate)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.expiryDate)}
-                                            </td>
-
-                                            <td
-                                                className={`px-6 py-4 text-sm font-semibold ${
-                                                    p.status === "Active"
-                                                        ? "text-green-600"
-                                                        : p.status === "Expired"
-                                                        ? "text-red-600"
-                                                        : "text-gray-700"
-                                                }`}
-                                            >
-                                                {p.status}
-                                            </td>
-
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
+                                    ) : filteredPawns.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
+                                                    <p className="text-gray-500">Try adjusting your search keywords.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredPawns.map((p) => (
+                                            <tr
+                                                key={p._id}
+                                                className={`transition ease-in-out duration-300 ${
+                                                    selectedPawn?._id === p._id ? "bg-yellow-100" : ""
+                                                } ${p.status === "Redeemed" ? "cursor-pointer hover:bg-gray-50" : "cursor-pointer hover:bg-gray-50"}`}
+                                                onClick={() => {
+                                                    if (p.status !== "Redeemed") {
+                                                        setSelectedPawn(p);
+                                                    }
+                                                }}
+                                                onDoubleClick={() => setDetailPawn(p)}
+                                            >
+                                                <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold whitespace-nowrap">
+                                                    PAWN-{p._id.slice(-6).toUpperCase()}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {p.customerId?.userId?.firstname} {p.customerId?.userId?.lastname}
+                                                </td>
+
+                                                <td className="px-6 py-6 text-sm text-gray-800">
+                                                    {p.itemName}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                                                    {formatCurrency(p.loanAmount)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                                                    {formatCurrency(p.balance)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.startDate)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.maturityDate)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.expiryDate)}
+                                                </td>
+
+                                                <td
+                                                    className={`px-6 py-4 text-sm font-semibold ${
+                                                        p.status === "Active"
+                                                            ? "text-green-600"
+                                                            : p.status === "Expired"
+                                                            ? "text-red-600"
+                                                            : "text-gray-700"
+                                                    }`}
+                                                >
+                                                    {p.status}
+                                                </td>
+
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            )}
                         </table>
 
                         <div className="p-6 mt-10 print:block hidden">
-                            {manager && (
+                            {appraiser && (
                                 <div>
-                                    <p className="text-sm text-gray-700">Prepared by: {manager.firstname} {manager.lastname}</p>
-                                    <p>Manager</p>
+                                    <p className="text-sm text-gray-700">Prepared by: {appraiser.firstname} {appraiser.lastname}</p>
+                                    <p>Appraiser</p>
                                 </div>
                             )}
                         </div>
@@ -519,7 +527,7 @@ const AppraiserPawn = () => {
                         <div className='flex gap-2'>
                             <button 
                                 onClick={() => setIsCreatePawnOpen(true)}
-                                className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 hover:border-gray-400'
+                                className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                             >
                                 Add
                             </button>
@@ -528,7 +536,7 @@ const AppraiserPawn = () => {
 
                                 <button
                                     onClick={handleRedeem}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
+                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                                     disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
                                     style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
                                 >
@@ -537,7 +545,7 @@ const AppraiserPawn = () => {
 
                                 <button     
                                     onClick={handleRenew}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
+                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                                     disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
                                     style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
                                 >
@@ -546,7 +554,7 @@ const AppraiserPawn = () => {
 
                                 <button 
                                     onClick={handlePayment}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
+                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                                     disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
                                     style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
                                 >
@@ -630,6 +638,14 @@ const AppraiserPawn = () => {
                 />
             )}
 
+            {showPaymentModal && selectedPawn && (
+                <PawnUpdateModal
+                    pawn={selectedPawn}
+                    onClose={() => setShowPaymentModal(false)}
+                    onConfirm={handleConfirmPayment}
+                    mode="payment"
+                />
+            )}
 
             <PawnSuccessModal
                 isOpen={successConfig.open}

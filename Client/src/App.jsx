@@ -23,6 +23,8 @@ import ManagerAbout from './pages/manager/ManagerAbout';
 import ManagerContact from './pages/manager/ManagerContact';
 import ManagerFAQs from './pages/manager/ManagerFAQs';
 import ManagerAccount from './pages/manager/ManagerAccount';
+import ManagerRate from './pages/manager/ManagerRate';
+import ManagerGallery from './pages/manager/ManagerGallery';
 
 import AppraiserDashboard from './pages/appraiser/AppraiserDashboard';
 import AppraiserCustomer from './pages/appraiser/AppraiserCustomer';
@@ -31,6 +33,8 @@ import AppraiserAbout from './pages/appraiser/AppraiserAbout';
 import AppraiserContact from './pages/appraiser/AppraiserContact';
 import AppraiserFAQs from './pages/appraiser/AppraiserFAQs';
 import AppraiserAccount from './pages/appraiser/AppraiserAccount';
+import AppraiserRate from './pages/appraiser/AppraiserRate';
+import AppraiserGallery from './pages/appraiser/AppraiserGallery';
 
 import CustomerDashboard from './pages/customer/CustomerDashboard';
 import CustomerPawn from './pages/customer/CustomerPawn';
@@ -68,6 +72,8 @@ const App = () => {
             <Route path="contact" element={<AppraiserContact />} />
             <Route path="faqs" element={<AppraiserFAQs />} />
             <Route path="account" element={<AppraiserAccount />} />
+            <Route path="rate" element={<AppraiserRate />} />
+            <Route path="gallery" element={<AppraiserGallery />} />
           </Route>
 
           <Route path="/manager">
@@ -78,6 +84,8 @@ const App = () => {
             <Route path="contact" element={<ManagerContact />} />
             <Route path="faqs" element={<ManagerFAQs />} />
             <Route path="account" element={<ManagerAccount />} />
+            <Route path="rate" element={<ManagerRate />} />
+            <Route path="gallery" element={<ManagerGallery />} />
           </Route>
 
           <Route path="/customer">

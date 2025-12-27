@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import SidebarManager from "../../components/ui/SidebarManager";
 import HeaderStaff from "../../components/ui/HeaderStaff";
 import axios from "../../api/axios";
+import SkeletonAbout from "../../components/ui/SkeletonAbout";
 
 const ManagerAbout = () => {
     const [loading, setLoading] = useState(true);
@@ -54,24 +55,22 @@ const ManagerAbout = () => {
                             ABOUT US
                         </span>
                     </div>
-                    <div className="bg-white rounded-sm shadow-sm  overflow-y-auto">
-
-                        <div className="bg-gray-50 border-b border-gray-200 px-6 py-4 flex justify-between items-center text-gray-800">
-                            <div>
-                                <h2 className="text-lg font-medium tracking-tight">
-                                    About the Pawnshop
-                                </h2>
-                                <p className="text-sm opacity-90">
-                                    Manage mission, vision, and organizational details
-                                </p>
+                    {loading ? (
+                        <SkeletonAbout/>
+                    ) : (
+                        <div className="bg-white rounded-sm shadow-sm  overflow-y-auto">
+                            <div className="bg-gray-50 border-b border-gray-200 px-6 py-4 flex justify-between items-center text-gray-800">
+                                <div>
+                                    <h2 className="text-lg font-medium tracking-tight">
+                                        About the Pawnshop
+                                    </h2>
+                                    <p className="text-sm opacity-90">
+                                        Manage mission, vision, and organizational details
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Body */}
-                        <div className="px-8 py-6">
-                            {loading ? (
-                                <p>Loading...</p>
-                            ) : (
+                            <div className="px-8 py-6">
                                 <>
                                     <div className="mb-10">
                                         <h3 className="text-gray-600 font-semibold mb-4 pb-2 border-b border-gray-300">
@@ -99,14 +98,13 @@ const ManagerAbout = () => {
                                     </div>
 
                                 </>
-                            )}
-                        </div>
+                            </div>
 
-                        {/* Footer */}
-                        <div className="px-6 py-4 border-t border-gray-300 bg-gray-50 text-sm text-gray-500">
-                            These details are visible on the system’s “About Us” page.
-                        </div>
-                    </div>
+                            <div className="px-6 py-4 border-t border-gray-300 bg-gray-50 text-sm text-gray-500">
+                                These details are visible on the system’s “About Us” page.
+                            </div>
+                        </div>  
+                    )}
                 </div>
             </div>
         </div>

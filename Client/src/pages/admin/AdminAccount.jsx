@@ -33,10 +33,9 @@ const AdminAccount = () => {
         fetchData();
     }, []);
 
-    if (!loading && (!admin || admin.role !== "admin")) {
+    if(!loading && (!admin || admin.role !== "admin")){
         return <NotAllowed />;
     }
-
 
     return (
         <div className="h-screen flex overflow-hidden"> 

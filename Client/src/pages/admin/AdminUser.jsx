@@ -146,7 +146,7 @@ const AdminUser = () => {
                                     ) : (
                                         staff.map(s => (
                                             <tr key={s._id} className={`cursor-pointer transition ${selectedStaff?._id === s._id ? 'bg-green-100' : 'hover:bg-gray-50'}`} onClick={() => setSelectedStaff(s)}>
-                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                <td className="px-6 py-4 text-sm text-gray-800">
                                                     {s.userId.firstname} {s.userId.middlename} {s.userId.lastname}
                                                 </td>
                                                 <td className="px-4 py-4 text-sm text-gray-800">

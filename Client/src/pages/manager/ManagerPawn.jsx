@@ -5,9 +5,9 @@ import HeaderStaff from "../../components/ui/HeaderStaff";
 import CreatePawnModal from "../../components/modals/CreatePawnModal";
 import CustomerListModal from "../../components/modals/CustomerListModal";
 import PawnDetailModal from "../../components/modals/PawnDetailModal";
-import PawnUpdateModal from "../../components/modals/PawnUpdateModal";
 import PawnSuccessModal from "../../components/modals/PawnSuccessModal";
 import ReceiptModal from "../../components/modals/ReceiptModal";
+import SkeletonTable from "../../components/ui/SkeletonTable";
 import { shortFormatDate } from "../../utils/FormatDate";
 import { formatCurrency } from "../../utils/FormatCurrency";
 import { useRef } from 'react';
@@ -17,21 +17,19 @@ import { UserX, Printer, Search } from "lucide-react";
 const ManagerPawn = () => {
     const [customers, setCustomers] = useState([]);
     const [pawns, setPawns] = useState([]);
-    const [manager, SetManager] = useState(null);
+    const [manager, setManager] = useState(null);
     const [search, setSearch] = useState("");
     const [filterType, setFilterType] = useState("All"); 
     const [filteredPawns, setFilteredPawns] = useState([]);
     const [startRange, setStartRange] = useState("");
     const [endRange, setEndRange] = useState("");
-    const [selectedPawn, setSelectedPawn] = useState(null);
     const [detailPawn, setDetailPawn] = useState(null);
     const [isCreatePawnOpen, setIsCreatePawnOpen] = useState(false);
     const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [receipt, setReceipt] = useState(null);
-    const [showRedeemModal, setShowRedeemModal] = useState(false);
-    const [showRenewModal, setShowRenewModal] = useState(false);
     const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+    const [pawnLoading, setPawnLoading] = useState(true);
     const [successConfig, setSuccessConfig] = useState({
         open: false,
         title: "",
@@ -45,7 +43,7 @@ const ManagerPawn = () => {
                 const response = await axios.get('user/me', {
                     withCredentials: true
                 });
-                SetManager(response.data.user)
+                setManager(response.data.user)
             }
             catch(err){
                 console.log(err);
@@ -77,6 +75,9 @@ const ManagerPawn = () => {
         catch(err){
             console.error("Error fetching pawns:", err);
         }
+        finally{
+            setPawnLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -92,101 +93,16 @@ const ManagerPawn = () => {
             const response = await axios.post("/pawn", data, { 
                 withCredentials: true 
             });
+            fetchPawns(); 
             setIsCreatePawnOpen(false); 
             openSuccessWithReceipt(
                 response.data.receipt,
                 "Pawn Created Successfully!",
                 "The pawn transaction has been recorded in the system."
-            );   
-            fetchPawns();       
+            );         
         } 
         catch(err){
             console.log("Failed to create pawn.", err);
-        }
-    };
-
-    const handleRedeem = () => {
-        if (!selectedPawn) return;
-        setShowRedeemModal(true);
-    };
-
-    const handleConfirmRedeem = async () => {
-        try{
-            const response = await axios.post(`/pawn/${selectedPawn._id}/redeem`, {
-                withCredentials: true
-            });
-            openSuccessWithReceipt(
-                response.data.receipt,
-                "Pawn Redeemed Successfully",
-                "The pawn has been redeemed."
-            );
-            fetchPawns();
-            setSelectedPawn(null);
-            setShowRedeemModal(false);
-            setSelectedPawn(null);
-        } 
-        catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleRenew = async () => {
-        if(!selectedPawn) return;
-        setShowRenewModal(true);
-    };
-
-    const handleConfirmRenew = async () => {
-        try{
-            const response = await axios.post(`/pawn/${selectedPawn._id}/renew`, {
-                withCredentials: true
-            });
-            openSuccessWithReceipt(
-                response.data.receipt,
-                "Pawn Renewed Successfully",
-                "The pawn has been renewed."
-            );
-            fetchPawns();
-            setSelectedPawn(null);
-            setShowRenewModal(false);
-            setSelectedPawn(null);
-        } 
-        catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handlePayment = async () => {
-        if (!selectedPawn) return;
-
-        const input = prompt("Enter payment amount:");
-        if (!input) return;
-
-        const amount = parseFloat(input);
-        if (isNaN(amount) || amount <= 0) {
-            alert("Invalid amount");
-            return;
-        }
-
-        if (selectedPawn.interestBalance <= 0) {
-            alert("No interest due to pay at the moment. Try Renew or Redeem instead.");
-            return;
-        }
-
-
-        try {
-            const res = await axios.post(`/pawn/${selectedPawn._id}/payment`, {
-                amount
-            }, { withCredentials: true });
-            fetchPawns();
-            setSelectedPawn(null);
-            openSuccessWithReceipt(
-                res.data.receipt,
-                "Payment Recorded Successfully!",
-                "The interest payment has been saved."
-            );
-        } catch (err) {
-            console.error(err);
-            alert("Failed to add payment.");
         }
     };
 
@@ -293,7 +209,6 @@ const ManagerPawn = () => {
 
     return (
         <div className="flex h-screen overflow-hidden">
-           
             <SidebarManager/>  
             <div className="flex flex-col flex-1">
                 <HeaderStaff/>
@@ -389,15 +304,15 @@ const ManagerPawn = () => {
 
                     </div>
 
-                    <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
+                    <div ref={printRef} className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
                         <h1 className="print-title hidden">List of Pawns</h1>
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-100 sticky top-0 z-10">
                                 <tr className="whitespace-nowrap">
-                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
+                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         PAWN ID
                                     </th>
-                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
+                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Customer Name
                                     </th>
                                     <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
@@ -406,13 +321,16 @@ const ManagerPawn = () => {
                                     <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Loan Amount
                                     </th>
-                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
+                                        Balance
+                                    </th>
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Start Date
                                     </th>
-                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900e uppercase whitespace-nowrap">
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900e uppercase">
                                         Maturity Date
                                     </th>
-                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Expiry Date
                                     </th>
                                     <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
@@ -421,95 +339,96 @@ const ManagerPawn = () => {
                                 </tr>
                             </thead>
 
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {pawns.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="8" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
+                            {pawnLoading ? (
+                                <SkeletonTable rows={8} columns={9} />
+                            ) : (
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {pawns.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No pawns yet!</h3>
+                                                    <p className="text-gray-500">Pawns will appear here once they submit a request.</p>
                                                 </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No pawns yet!</h3>
-                                                <p className="text-gray-500">Pawns will appear here once they submit a request.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : filteredPawns.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="8" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
-                                                </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
-                                                <p className="text-gray-500">Try adjusting your search keywords.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredPawns.map((p) => (
-                                        <tr
-                                            key={p._id}
-                                            className={`transition ease-in-out duration-300 ${
-                                                selectedPawn?._id === p._id ? "bg-yellow-100" : ""
-                                            } ${p.status === "Redeemed" ? "cursor-pointer hover:bg-gray-50" : "cursor-pointer hover:bg-gray-50"}`}
-                                            onClick={() => {
-                                                if (p.status !== "Redeemed") {
-                                                setSelectedPawn(p);
-                                                }
-                                            }}
-                                            onDoubleClick={() => setDetailPawn(p)}
-                                        >
-                                            <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold whitespace-nowrap">
-                                                PAWN-{p._id.slice(-6).toUpperCase()}
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {p.customerId?.userId?.firstname} {p.customerId?.userId?.lastname}
-                                            </td>
-
-                                            <td className="px-6 py-6 text-sm text-gray-800">
-                                                {p.itemName}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                                                {formatCurrency(p.loanAmount)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.startDate)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.maturityDate)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.expiryDate)}
-                                            </td>
-
-                                            <td
-                                                className={`px-6 py-4 text-sm font-semibold ${
-                                                    p.status === "Active"
-                                                        ? "text-green-600"
-                                                        : p.status === "Expired"
-                                                        ? "text-red-600"
-                                                        : "text-gray-700"
-                                                }`}
-                                            >
-                                                {p.status}
-                                            </td>
-
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
+                                    ) : filteredPawns.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
+                                                    <p className="text-gray-500">Try adjusting your search keywords.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredPawns.map((p) => (
+                                            <tr
+                                                key={p._id}
+                                                className='ease-in-out duration-300 cursor-pointer hover:bg-gray-50'
+                                                onDoubleClick={() => setDetailPawn(p)}
+                                            >
+                                                <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold whitespace-nowrap">
+                                                    PAWN-{p._id.slice(-6).toUpperCase()}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {p.customerId?.userId?.firstname} {p.customerId?.userId?.lastname}
+                                                </td>
+
+                                                <td className="px-6 py-6 text-sm text-gray-800">
+                                                    {p.itemName}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                                                    {formatCurrency(p.loanAmount)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                                                    {formatCurrency(p.balance)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.startDate)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.maturityDate)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.expiryDate)}
+                                                </td>
+
+                                                <td
+                                                    className={`px-6 py-4 text-sm font-semibold ${
+                                                        p.status === "Active"
+                                                            ? "text-green-600"
+                                                            : p.status === "Expired"
+                                                            ? "text-red-600"
+                                                            : "text-gray-700"
+                                                    }`}
+                                                >
+                                                    {p.status}
+                                                </td>
+
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            )}
                         </table>
 
                         <div className="p-6 mt-10 print:block hidden">
                             {manager && (
                                 <div>
                                     <p className="text-sm text-gray-700">Prepared by: {manager.firstname} {manager.lastname}</p>
-                                    <p>Manager</p>
+                                    <p>manageristrator</p>
                                 </div>
                             )}
                         </div>
@@ -519,41 +438,10 @@ const ManagerPawn = () => {
                         <div className='flex gap-2'>
                             <button 
                                 onClick={() => setIsCreatePawnOpen(true)}
-                                className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 hover:border-gray-400'
+                                className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 hover:border-gray-400 ease-in-out duration-300'
                             >
                                 Add
                             </button>
-
-                            <div className='flex gap-2'>
-
-                                <button
-                                    onClick={handleRedeem}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
-                                    disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
-                                    style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
-                                >
-                                    Redeem
-                                </button>
-
-                                <button     
-                                    onClick={handleRenew}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
-                                    disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
-                                    style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
-                                >
-                                    Renew
-                                </button>
-
-                                <button 
-                                    onClick={handlePayment}
-                                    className='px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400'
-                                    disabled={!selectedPawn || selectedPawn.status === "Redeemed"}
-                                    style={{ cursor: !selectedPawn || selectedPawn.status === "Redeemed" ? "not-allowed" : "pointer", opacity: !selectedPawn || selectedPawn.status === "Redeemed" ? 0.5 : 1 }}
-                                >
-                                    Payment
-                                </button>
-                            </div>
-
                         </div>
 
                         <button onClick={() => handlePrint(printRef, {
@@ -575,7 +463,6 @@ const ManagerPawn = () => {
                     pawn={detailPawn} 
                     onClose={() => { 
                         setDetailPawn(null)
-                        setSelectedPawn(null)
                     }} 
                 />
             )}
@@ -606,31 +493,6 @@ const ManagerPawn = () => {
                 }}
             />
            
-            {showRedeemModal && (
-                <PawnUpdateModal
-                    pawn={selectedPawn}
-                    mode="redeem"         
-                    onClose={() => {
-                        setShowRedeemModal(false)
-                        setSelectedPawn(null)
-                    }}
-                    onConfirm={handleConfirmRedeem}
-                />
-            )}
-
-            {showRenewModal && (
-                <PawnUpdateModal
-                    pawn={selectedPawn}
-                    mode="renew"          
-                    onClose={() => {
-                        setShowRenewModal(false)
-                        setSelectedPawn(null)
-                    }}
-                    onConfirm={handleConfirmRenew}
-                />
-            )}
-
-
             <PawnSuccessModal
                 isOpen={successConfig.open}
                 title={successConfig.title}

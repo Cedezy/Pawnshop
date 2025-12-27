@@ -4,6 +4,7 @@ import HeaderStaff from "../../components/ui/HeaderStaff";
 import axios from "../../api/axios";
 import { HelpCircle } from "lucide-react";
 import { formatDate } from "../../utils/FormatDate";
+import SkeletonFAQs from '../../components/ui/SkeletonFAQs';
 
 const ManagerFAQs = () => {
     const [faqs, setFaqs] = useState([]);
@@ -11,14 +12,16 @@ const ManagerFAQs = () => {
 
     useEffect(() => {
         const fetchFaqs = async () => {
-            try {
+            try{
                 const response = await axios.get("/faqs", {
                     withCredentials: true,
                 });
                 setFaqs(response.data.faqs || []);
-            } catch (err) {
+            } 
+            catch(err){
                 console.error(err);
-            } finally {
+            } 
+            finally {
                 setLoading(false);
             }
         };
@@ -30,18 +33,16 @@ const ManagerFAQs = () => {
             <SidebarManager />
             <div className="flex flex-col flex-1">
                 <HeaderStaff />
-
                 <div className="px-6 pb-4 flex flex-col gap-5 h-screen pt-4 overflow-hidden">
                     <div className="flex justify-center items-center">
                         <span className="text-2xl tracking-tighter font-medium uppercase text-gray-700">
                             frequently asked questions
                         </span>
                     </div>
-
-                    <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
-                        {loading ? (
-                            <p className="p-6">Loading...</p>
-                        ) : (
+                    {loading ? (
+                        <SkeletonFAQs/>
+                    ) : (
+                        <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50 sticky top-0 z-10">
                                     <tr>
@@ -90,9 +91,9 @@ const ManagerFAQs = () => {
                                         ))
                                     )}
                                 </tbody>
-                            </table>
-                        )}
-                    </div>
+                            </table> 
+                        </div>
+                    )}                    
                 </div>
             </div>
         </div>

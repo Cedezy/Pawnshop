@@ -4,10 +4,12 @@ import HeaderStaff from '../../components/ui/HeaderStaff';
 import axios from '../../api/axios';
 import { Search, UserX, Printer } from 'lucide-react';
 import { useRef } from 'react';
-import { handlePrint } from '../../utils/PrintUtils';;
+import { handlePrint } from '../../utils/PrintUtils';
+import CreateCustomer from '../../components/modals/CreateCustomer';
 import CustomerModal from '../../components/modals/CustomerModal';
 import TransactionHistoryModal from '../../components/modals/TransactionHistoryModal';
 import { shortFormatDate } from '../../utils/FormatDate';
+import SkeletonTable from '../../components/ui/SkeletonTable';
 
 const ManagerCustomer = () => {
     const [customers, setCustomers] = useState([]);
@@ -18,53 +20,62 @@ const ManagerCustomer = () => {
     const [endRange, setEndRange] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [transactionHistory, setTransactionHistory] = useState([]);
+    const [transactionHistory, setTransactionHistory] = useState(null);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
-    const [manager, SetManager] = useState([]);
+    const [customersLoading, setCustomersLoading] = useState(true);
+    const [manager, setManager] = useState(null);
     const printRef = useRef();
 
-    useEffect(() => {
-        const fetchManagerData = async () => {
-            try{
-                const response = await axios.get('user/me', {
-                    withCredentials: true
-                });
-                SetManager(response.data.user)
-            }
-            catch(err){
-                console.log(err);
-            }
+    const fetchManagerData = async () => {
+        try{
+            const response = await axios.get('user/me', {
+                withCredentials: true
+            });
+            setManager(response.data.user)
         }
-        fetchManagerData();
-    }, []);
+        catch(err){
+            console.log(err);
+        }
+    }
 
-    useEffect(() => {
-        const fetchCustomers = async () => {
-            try{
-                const response = await axios.get(`/customer`, { 
-                    withCredentials: true 
-                });
-                setCustomers(response.data.customers);
-                setFilteredCustomers(response.data.customers); 
-            } 
-            catch(err){
-                console.error(err);
-            }
-        };
-        fetchCustomers();
-    }, []);
+    const fetchCustomers = async () => {
+        try{
+            const response = await axios.get(`/customer`, { 
+                withCredentials: true 
+            });
+            setCustomers(response.data.customers);
+            setFilteredCustomers(response.data.customers); 
+        } 
+        catch(err){
+            console.error(err);
+        }
+        finally{
+            setCustomersLoading(false);
+        }
+    };
+
+     useEffect(() => {
+        const fetchData = () => {
+            fetchManagerData();
+            fetchCustomers();
+        }
+        fetchData()
+    },[]);   
 
     const handleTransactionHistory = async (user) => {
+        setTransactionHistory(null); 
+        setShowHistoryModal(true); 
+
         try{
             const response = await axios.get(`/customer/${user._id}/transactions`, { 
                 withCredentials: true 
             });
             setTransactionHistory(response.data.transactionHistory || []);
             setShowModal(false); 
-            setShowHistoryModal(true); 
         } 
         catch (err) {
             console.error(err);
+            setTransactionHistory([]); 
         }
     };
 
@@ -126,6 +137,7 @@ const ManagerCustomer = () => {
 
         return () => clearTimeout(timer);
     }, [filterType, customers]);
+
 
     return (
         <div className="h-screen flex overflow-hidden"> 
@@ -220,7 +232,7 @@ const ManagerCustomer = () => {
                         <h1 className="print-title hidden">List of Customers</h1>
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-100 sticky top-0 z-10">
-                                <tr>
+                                <tr className='whitespace-nowrap'>
                                     <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase whitespace-nowrap">
                                         Customer ID
                                     </th>
@@ -241,66 +253,70 @@ const ManagerCustomer = () => {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {customers.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="6" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
+                            {customersLoading ? (
+                                <SkeletonTable rows={8} columns={6} />
+                            ) : (
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {customers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No customers yet!</h3>
+                                                    <p className="text-gray-500">Customers will appear here once they submit a request.</p>
                                                 </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No customers yet!</h3>
-                                                <p className="text-gray-500">Customers will appear here once they submit a request.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : filteredCustomers.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="6" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
-                                                </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
-                                                <p className="text-gray-500">Try adjusting your search keywords.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredCustomers.map(customer => (
-                                        <tr key={customer._id}
-                                            onDoubleClick={() => {                         
-                                                setSelectedUser(customer);
-                                                setShowModal(true);
-                                            }}
-                                            className={`cursor-pointer transition ${selectedUser?._id === customer._id ? 'bg-green-100' : 'hover:bg-gray-50 ease-in-out duration-300'
-                                        }`}>
-                                            <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold">
-                                                CMR-{customer._id.slice(-6).toUpperCase()}
-                                            </td>
-                                            <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
-                                                {customer.userId?.firstname} {customer.userId?.lastname}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800">
-                                                {customer.userId?.email}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-700">
-                                                {customer.phone}    
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800">
-                                                {customer.street}, {customer.barangay}, {customer.city} {customer.province}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                                                {shortFormatDate(customer.createdAt)}    
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
+                                    ) : filteredCustomers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
+                                                    <p className="text-gray-500">Try adjusting your search keywords.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredCustomers.map(customer => (
+                                            <tr key={customer._id}
+                                                onDoubleClick={() => {                         
+                                                    setSelectedUser(customer);
+                                                    setShowModal(true);
+                                                }}
+                                                className={`cursor-pointer transition ${selectedUser?._id === customer._id ? 'bg-green-100' : 'hover:bg-gray-50 ease-in-out duration-300'
+                                            }`}>
+                                                <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold">
+                                                    CMR-{customer._id.slice(-6).toUpperCase()}
+                                                </td>
+                                                <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
+                                                    {customer.userId?.firstname} {customer.userId?.lastname}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800">
+                                                    {customer.userId?.email}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700">
+                                                    {customer.phone}    
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800">
+                                                    {customer.street}, {customer.barangay}, {customer.city} {customer.province}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                                                    {shortFormatDate(customer.createdAt)}    
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            )}
                         </table>
                         <div className="p-6 mt-10 print:block hidden">
                             {manager && (
@@ -311,7 +327,7 @@ const ManagerCustomer = () => {
                             )}
                         </div>
                     </div>
-                    <div className="flex justify-end">     
+                    <div className="flex justify-end">       
                         <button onClick={() => handlePrint(printRef, {
                                 title: 'List of Customers',
                                 customDate: new Date().toLocaleDateString('en-US', { 

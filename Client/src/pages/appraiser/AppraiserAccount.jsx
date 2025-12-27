@@ -3,119 +3,127 @@ import SidebarAppraiser from "../../components/ui/SidebarAppraiser";
 import HeaderStaff from "../../components/ui/HeaderStaff";
 import axios from "../../api/axios";
 import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
+import NotAllowed from "../../components/ui/NotAllowed";
+import SkeletonAccount from '../../components/ui/SkeletonAccount';
 
 const AppraiserAccount = () => {
-    const [manager, setManager] = useState(null);
+    const [appraiser, setAppraiser] = useState(null);
     const [openModal, setOpenModal] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    const fetchManager = async () => {
-        const res = await axios.get("/user/me", {
-            withCredentials: true,
-        });
-        setManager(res.data.user);
+    const fetchAppraiser = async () => {
+        try{
+            const response = await axios.get("/user/me", {
+                withCredentials: true,
+            });
+            setAppraiser(response.data.user);
+        }
+        catch(err){
+            console.log(err);
+        }
+        finally{
+            setLoading(false);
+        }
     };
 
-  
     useEffect(() => {
         const fetchData = () => {
-            fetchManager();
+            fetchAppraiser();
         }
         fetchData();
     }, []);
 
-
-    if (!manager) return <div>Loading...</div>;
+    if(!loading && (!appraiser || appraiser.role !== "appraiser")){
+        return <NotAllowed />;
+    }
 
     return (
         <div className="h-screen flex overflow-hidden">
             <SidebarAppraiser />
             <div className="flex flex-col flex-1">
                 <HeaderStaff />
-
                 <div className="px-6 pb-4 gap-5 h-screen pt-4 overflow-hidden">
-                    <div className="bg-white mx-auto overflow-hidden">
+                    {loading ? (
+                        <SkeletonAccount/>
+                    ) : (
+                        <div className="bg-white mx-auto overflow-hidden">
+                            <div className="bg-gray-50 border-b border-gray-200 px-6 py-4 text-gray-800">
+                                <h2 className="text-lg font-medium">My Account</h2>
+                                <p className="text-sm opacity-90">
+                                    View your account information and update your password
+                                </p>
+                            </div>
 
-                        {/* Header */}
-                        <div className="bg-gray-50 border-b border-gray-200 px-6 py-4 text-gray-800">
-                            <h2 className="text-lg font-medium">My Account</h2>
-                            <p className="text-sm opacity-90">
-                                View your account information and update your password
-                            </p>
-                        </div>
+                            <div className="px-8 py-6">
+                                <div className="mb-10">
+                                    <h3 className="text-gray-600 font-semibold mb-4 pb-2 border-b border-gray-300">
+                                        ACCOUNT INFORMATION
+                                    </h3>
 
-                        {/* Body */}
-                        <div className="px-8 py-6">
+                                    <div className="grid grid-cols-4 gap-x-8 gap-y-6">
+                                        <div>
+                                            <p className="text-gray-500 text-sm mb-1">USER ID</p>
+                                            <p className="text-gray-900 font-mono font-medium">
+                                                APR-{appraiser._id.slice(-6).toUpperCase()}
+                                            </p>
+                                        </div>
 
-                            {/* Account Info */}
-                            <div className="mb-10">
-                                <h3 className="text-gray-600 font-semibold mb-4 pb-2 border-b border-gray-300">
-                                    ACCOUNT INFORMATION
-                                </h3>
+                                        <div>
+                                            <p className="text-gray-500 text-sm mb-1">FIRST NAME</p>
+                                            <p className="text-gray-900 font-medium">{appraiser.firstname}</p>
+                                        </div>
 
-                                <div className="grid grid-cols-4 gap-x-8 gap-y-6">
-                                    <div>
-                                        <p className="text-gray-500 text-sm mb-1">USER ID</p>
-                                        <p className="text-gray-900 font-mono font-medium">
-                                            MGR-{manager._id.slice(-6).toUpperCase()}
-                                        </p>
+                                        <div>
+                                            <p className="text-gray-500 text-sm mb-1">MIDDLE NAME</p>
+                                            <p className="text-gray-900 font-medium">
+                                                {appraiser.middlename || "-"}
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-gray-500 text-sm mb-1">LAST NAME</p>
+                                            <p className="text-gray-900 font-medium">{appraiser.lastname}</p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-gray-500 text-sm mb-1">EMAIL ADDRESS</p>
+                                            <p className="text-gray-900 font-medium">{appraiser.email}</p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-gray-500 text-sm mb-1">ACCOUNT STATUS</p>
+                                            <p className="text-gray-900 font-medium">
+                                                {appraiser.isActive ? "Active" : "Inactive"}
+                                            </p>
+                                        </div>
                                     </div>
+                                </div>
 
-                                    <div>
-                                        <p className="text-gray-500 text-sm mb-1">FIRST NAME</p>
-                                        <p className="text-gray-900 font-medium">{manager.firstname}</p>
-                                    </div>
+                                {/* Security Section */}
+                                <div>
+                                    <h3 className="text-gray-600 font-semibold mb-4 pb-2 border-b border-gray-300">
+                                        SECURITY SETTINGS
+                                    </h3>
 
-                                    <div>
-                                        <p className="text-gray-500 text-sm mb-1">MIDDLE NAME</p>
-                                        <p className="text-gray-900 font-medium">
-                                            {manager.middlename || "-"}
-                                        </p>
-                                    </div>
+                                    <p className="text-sm text-gray-500 mb-4 max-w-2xl">
+                                        For your account’s security, it is recommended to update your password
+                                        regularly. Do not share your password with anyone.
+                                    </p>
 
-                                    <div>
-                                        <p className="text-gray-500 text-sm mb-1">LAST NAME</p>
-                                        <p className="text-gray-900 font-medium">{manager.lastname}</p>
-                                    </div>
-
-                                    <div>
-                                        <p className="text-gray-500 text-sm mb-1">EMAIL ADDRESS</p>
-                                        <p className="text-gray-900 font-medium">{manager.email}</p>
-                                    </div>
-
-                                    <div>
-                                        <p className="text-gray-500 text-sm mb-1">ACCOUNT STATUS</p>
-                                        <p className="text-gray-900 font-medium">
-                                            {manager.isActive ? "Active" : "Inactive"}
-                                        </p>
-                                    </div>
+                                    <button
+                                        onClick={() => setOpenModal(true)}
+                                        className="px-6 py-2 bg-teal-600 text-white rounded-sm hover:bg-teal-700 font-medium text-sm"
+                                    >
+                                        Change Password
+                                    </button>
                                 </div>
                             </div>
 
-                            {/* Security Section */}
-                            <div>
-                                <h3 className="text-gray-600 font-semibold mb-4 pb-2 border-b border-gray-300">
-                                    SECURITY SETTINGS
-                                </h3>
-
-                                <p className="text-sm text-gray-500 mb-4 max-w-2xl">
-                                    For your account’s security, it is recommended to update your password
-                                    regularly. Do not share your password with anyone.
-                                </p>
-
-                                <button
-                                    onClick={() => setOpenModal(true)}
-                                    className="px-6 py-2 bg-teal-600 text-white rounded-sm hover:bg-teal-700 font-medium text-sm"
-                                >
-                                    Change Password
-                                </button>
+                            <div className="px-6 py-4 border-t border-gray-300 bg-gray-50 text-sm text-gray-500">
+                                This account has appraiser-level access to the system.
                             </div>
                         </div>
-
-                        {/* Footer */}
-                        <div className="px-6 py-4 border-t border-gray-300 bg-gray-50 text-sm text-gray-500">
-                            This account has manager-level access to the system.
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
