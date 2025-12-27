@@ -98,13 +98,13 @@ const AdminPawn = () => {
             const response = await axios.post("/pawn", data, { 
                 withCredentials: true 
             });
+            fetchPawns(); 
             setIsCreatePawnOpen(false); 
             openSuccessWithReceipt(
                 response.data.receipt,
                 "Pawn Created Successfully!",
                 "The pawn transaction has been recorded in the system."
-            );   
-            fetchPawns();       
+            );         
         } 
         catch(err){
             console.log("Failed to create pawn.", err);
@@ -121,15 +121,15 @@ const AdminPawn = () => {
             const response = await axios.post(`/pawn/${selectedPawn._id}/redeem`, {
                 withCredentials: true
             });
+            fetchPawns();
+            setSelectedPawn(null);
+            setShowRedeemModal(false);
+            setSelectedPawn(null);
             openSuccessWithReceipt(
                 response.data.receipt,
                 "Pawn Redeemed Successfully",
                 "The pawn has been redeemed."
             );
-            fetchPawns();
-            setSelectedPawn(null);
-            setShowRedeemModal(false);
-            setSelectedPawn(null);
         } 
         catch (error) {
             console.error(error);
@@ -146,43 +146,43 @@ const AdminPawn = () => {
             const response = await axios.post(`/pawn/${selectedPawn._id}/renew`, {
                 withCredentials: true
             });
+            fetchPawns();
+            setSelectedPawn(null);
+            setShowRenewModal(false);
+            setSelectedPawn(null);
             openSuccessWithReceipt(
                 response.data.receipt,
                 "Pawn Renewed Successfully",
                 "The pawn has been renewed."
             );
-            fetchPawns();
-            setSelectedPawn(null);
-            setShowRenewModal(false);
-            setSelectedPawn(null);
         } 
-        catch (error) {
+        catch(error){
             console.error(error);
         }
     };
 
     const handlePayment = () => {
         if (!selectedPawn) return;
-        setShowPaymentModal(true); // similar to showRenewModal / showRedeemModal
+        setShowPaymentModal(true); 
     };
 
     const handleConfirmPayment = async ({ amountPaid, paymentMethod}) => {
         try {
-            const res = await axios.post(`/pawn/${selectedPawn._id}/payment`, {
+            const response = await axios.post(`/pawn/${selectedPawn._id}/payment`, {
                 amount: amountPaid,
                 paymentMethod, 
             }, { withCredentials: true });
-
+            fetchPawns();
+            setSelectedPawn(null);
+            setShowRenewModal(false);
+            setSelectedPawn(null);
             openSuccessWithReceipt(
-                res.data.receipt,
+                response.data.receipt,
                 "Payment Recorded Successfully!",
                 "The principal payment has been saved."
             );
-
-            fetchPawns();
-            setSelectedPawn(null);
-            setShowPaymentModal(false);
-        } catch (err) {
+        } 
+        catch(err){
             console.error(err);
             alert("Failed to add payment.");
         }
@@ -291,7 +291,6 @@ const AdminPawn = () => {
 
     return (
         <div className="flex h-screen overflow-hidden">
-           
             <SidebarAdmin/>  
             <div className="flex flex-col flex-1">
                 <HeaderStaff/>
