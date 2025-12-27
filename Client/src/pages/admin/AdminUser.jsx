@@ -103,7 +103,7 @@ const AdminUser = () => {
                                         Full Name
                                     </th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">
-                                        Email
+                                        Email Address
                                     </th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">
                                         User Type
@@ -142,12 +142,12 @@ const AdminUser = () => {
                                         staff.map(s => (
                                             <tr key={s._id} className={`cursor-pointer transition ${selectedStaff?._id === s._id ? 'bg-green-100' : 'hover:bg-gray-50'}`} onClick={() => setSelectedStaff(s)}>
                                                 <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                    {s.userId.firstname} {s.userId.lastname}
+                                                    {s.userId.firstname} {s.userId.middlename} {s.userId.lastname}
                                                 </td>
                                                 <td className="px-4 py-4 text-sm text-gray-800">
                                                     {s.userId.email}
                                                 </td>
-                                                <td className="px-4 py-4 text-sm text-gray-800 capitalize">
+                                                <td className="px-4 py-4 text-sm text-gray-800 capitalize font-medium">
                                                     {s.userId.role}
                                                 </td>
                                                 <td className="px-4 py-4 text-sm text-gray-800">
