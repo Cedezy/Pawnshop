@@ -15,7 +15,6 @@ const AdminUser = () => {
     const [admin, setAdmin] = useState(null);
     const [confirmAction, setConfirmAction] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [actionLoading, setActionLoading] = useState(false);
     const printRef = useRef();
     const { showToast } = useToast();
 
@@ -57,8 +56,7 @@ const AdminUser = () => {
 
     const handleDeactivateReactivate = async () => {
         if(!selectedStaff) return;
-        
-        setActionLoading(true);
+
         const userId = selectedStaff.userId._id;
         try{
             let response;
@@ -69,15 +67,12 @@ const AdminUser = () => {
             else{
                 response = await axios.put(`/user/${userId}/reactivate`);
             }
+            showToast("Success", response.data.message, "success");
             fetchStaff();
             setSelectedStaff(null);
-            showToast("Success", response.data.message, "success");
         } 
         catch(err){
             console.error(err);
-        }
-        finally{
-            setActionLoading(false);
         }
     };
 
@@ -147,7 +142,7 @@ const AdminUser = () => {
                                         staff.map(s => (
                                             <tr key={s._id} className={`cursor-pointer transition ${selectedStaff?._id === s._id ? 'bg-green-100' : 'hover:bg-gray-50'}`} onClick={() => setSelectedStaff(s)}>
                                                 <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                    {s.userId.firstname} {s.userId.middlename} {s.userId.lastname}
+                                                    {s.userId.firstname} {s.userId.middlena} {s.userId.lastname}
                                                 </td>
                                                 <td className="px-4 py-4 text-sm text-gray-800">
                                                     {s.userId.email}
@@ -193,19 +188,13 @@ const AdminUser = () => {
                                 Add
                             </button>
                             <button
-                                disabled={actionLoading}
-                                onClick={handleDeactivateReactivate}
-                                className={`px-4 py-2 text-sm rounded-sm text-white
-                                    ${actionLoading
-                                        ? 'bg-gray-400 cursor-not-allowed'
-                                        : selectedStaff.userId.isActive
-                                            ? 'bg-red-500 hover:bg-red-600'
-                                            : 'bg-green-500 hover:bg-green-600'
-                                    }
-                                `}
+                                disabled={!selectedStaff}
+                                onClick={() => setConfirmAction(true)} // open confirmation modal
+                                className={`px-5 py-2.5 text-sm font-medium rounded-sm ${selectedStaff ? (selectedStaff.userId.isActive ? 'bg-red-500 text-white' : 'bg-green-500 text-white') : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
                             >
-                                {actionLoading ? 'Processing...' : selectedStaff.userId.isActive ? 'Deactivate' : 'Reactivate'}
+                                {selectedStaff ? (selectedStaff.userId.isActive ? 'Deactivate' : 'Reactivate') : 'Select Staff'}
                             </button>
+
                         </div>
 
                         <button
