@@ -25,14 +25,14 @@ const EditProfileModal = ({
             <div className="bg-white rounded-sm shadow-lg w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col animate-fade-in">
 
                 {/* Header */}
-                <div className="bg-yellow-500 px-6 py-5 flex justify-between items-center">
+                <div className="bg-teal-600 px-6 py-5 flex justify-between items-center">
                     <div>
                         <h2 className="text-lg font-medium text-white">Edit Profile</h2>
                         <p className="text-sm text-yellow-50">
                             Some information cannot be edited for security reasons.
                         </p>
                     </div>
-                    <button onClick={onClose} className="text-white hover:bg-yellow-600 p-1 rounded-full">
+                    <button onClick={onClose} className="text-gray-50 hover:text-gray-50 hover:bg-teal-400 ease-in-out duration-300 cursor-pointer p-1 rounded-full">
                         <X size={22} />
                     </button>
                 </div>
@@ -89,7 +89,7 @@ const EditProfileModal = ({
                                     <label className="absolute left-0 -top-1 text-xs text-gray-500
                                         peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                                         peer-focus:top-0 peer-focus:text-xs peer-focus:text-yellow-500">
-                                        {field.replace(/([A-Z])/g, " $1").toUpperCase()}
+                                        {field.replace(/([A-Z])/g, " $1")}
                                     </label>
                                 </div>
                             ))}
@@ -103,14 +103,14 @@ const EditProfileModal = ({
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">
                     <button
                         onClick={onClose}
-                        className="px-5 py-2 border border-gray-300 rounded-sm text-sm"
+                        className="px-5 py-2 border-2 border-gray-300 text-gray-700 rounded-sm cursor-pointer hover:bg-gray-100 ease-in-out duration-300 font-medium text-sm"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="px-6 py-2 bg-yellow-500 text-white rounded-sm disabled:opacity-50"
+                        className="px-6 py-2 text-sm bg-teal-600 cursor-pointer ease-in-out duration-300 text-white rounded-sm disabled:opacity-50"
                     >
                         {loading ? "Saving..." : "Save Changes"}
                     </button>

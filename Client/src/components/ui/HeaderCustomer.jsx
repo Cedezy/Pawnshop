@@ -28,7 +28,7 @@ const HeaderCustomer = () => {
 
     return (
         <div className="shadow-sm">
-            <div className="bg-linear-to-r from-yellow-500 via-yellow-400 to-yellow-500">
+            <div className="bg-linear-to-r from-teal-500 via-teal-600 to-teal-500">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between md:justify-center py-4">
                         <div className="flex items-center gap-4">
