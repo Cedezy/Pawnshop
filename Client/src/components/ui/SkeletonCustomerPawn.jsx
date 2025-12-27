@@ -47,24 +47,6 @@ const SkeletonCustomerPawn = ({ rows = 5 }) => {
                             <td className="px-6 py-6">
                                 <div className="h-4 bg-gray-300 rounded w-32"></div>
                             </td>
-                            <td className="px-6 py-6">
-                                <div className="h-4 bg-gray-300 rounded w-20"></div>
-                            </td>
-                            <td className="px-6 py-6">
-                                <div className="h-4 bg-gray-300 rounded w-20"></div>
-                            </td>
-                            <td className="px-6 py-6">
-                                <div className="h-4 bg-gray-300 rounded w-20"></div>
-                            </td>
-                            <td className="px-6 py-6">
-                                <div className="h-4 bg-gray-300 rounded w-20"></div>
-                            </td>
-                            <td className="px-6 py-6">
-                                <div className="h-4 bg-gray-300 rounded w-16"></div>
-                            </td>
-                            <td className="px-6 py-6">
-                                <div className="h-4 bg-gray-300 rounded w-20"></div>
-                            </td>
                         </tr>
                     ))}
                 </tbody>

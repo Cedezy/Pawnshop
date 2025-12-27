@@ -106,28 +106,28 @@ const CustomerPawn = () => {
                                             <td className="px-6 py-4 text-sm text-gray-800 font-mono font-semibold whitespace-nowrap">
                                                 PAWN-{pawn.pawnId.slice(-6).toUpperCase()}
                                             </td>
-                                            <td className="px-6 py-6 text-sm text-gray-800">
+                                            <td className="px-6 py-6 text-sm text-gray-800 whitespace-nowrap">
                                                 {shortFormatDate(pawn.startDate)}
                                             </td>
                                             <td className="px-6 py-6 text-sm text-gray-800">
                                                 {pawn.itemName}
                                             </td>
-                                            <td className="px-6 py-6 text-sm text-gray-900 font-medium">
+                                            <td className="px-6 py-6 text-sm text-gray-900 font-medium whitespace-nowrap">
                                                 {formatCurrency(pawn.amount)}
                                             </td>
-                                            <td className="px-6 py-6 text-sm text-gray-900 font-medium">
+                                            <td className="px-6 py-6 text-sm text-gray-900 font-medium whitespace-nowrap">
                                                 {formatCurrency(pawn.balance)}
                                             </td>
-                                            <td className="px-6 py-6 text-sm text-gray-800">
+                                            <td className="px-6 py-6 text-sm text-gray-800 whitespace-nowrap">
                                                 {shortFormatDate(pawn.maturityDate)}
                                             </td>
-                                            <td className="px-6 py-6 text-sm text-gray-800">
+                                            <td className="px-6 py-6 text-sm text-gray-800 whitespace-nowrap">
                                                 {shortFormatDate(pawn.expiryDate)}
                                             </td>
                                             <td className="px-6 py-6 text-sm text-gray-800 font-medium">
                                                 {pawn.status}
                                             </td>
-                                             <td className="px-6 py-6 text-sm text-gray-800">
+                                             <td className="px-6 py-6 text-sm text-gray-800 whitespace-nowrap">
                                                 <button
                                                     onClick={() => setSelectedPawn(pawn)}
                                                     className="cursor-pointer underline"
