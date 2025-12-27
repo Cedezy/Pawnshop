@@ -21,7 +21,7 @@ const AdminCustomer = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [transactionHistory, setTransactionHistory] = useState([]);
+    const [transactionHistory, setTransactionHistory] = useState(null);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [customersLoading, setCustomersLoading] = useState(true);
     const [admin, setAdmin] = useState(null);
@@ -64,7 +64,7 @@ const AdminCustomer = () => {
     },[]);   
 
     const handleTransactionHistory = async (user) => {
-        setTransactionHistory([]); 
+        setTransactionHistory(null); 
         setShowHistoryModal(true); 
 
         try{
@@ -76,6 +76,7 @@ const AdminCustomer = () => {
         } 
         catch (err) {
             console.error(err);
+            setTransactionHistory([]); 
         }
     };
 
