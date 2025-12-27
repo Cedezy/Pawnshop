@@ -36,8 +36,8 @@ exports.createCustomer = async (req, res) => {
             idType: req.body.idType,
             idNumber: req.body.idNumber,
             idExpiryDate: req.body.idExpiryDate,
-            photoUrl,    // <-- optional customer photo
-            idPhotoUrl,  // <-- ID photo Cloudinary URL
+            photoUrl,    
+            idPhotoUrl, 
             status: "Active"
         });
 

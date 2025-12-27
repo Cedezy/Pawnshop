@@ -7,7 +7,7 @@ const {
     updateInterestRate,
     addScheduleRates,
     updateScheduleRate,
-    getCurrentRates
+    getScheduleRate
 } = require("../controllers/RateController");
 
 const { userVerification } = require("../middlewares/AuthMiddleware");
@@ -23,6 +23,6 @@ router.post("/schedule-rate", userVerification, requireAdmin, addScheduleRates);
 router.put("/schedule-rate/:id", userVerification, requireAdmin, updateScheduleRate);
 
 /* ================= CURRENT RATE ================= */
-router.get("/current", userVerification, getCurrentRates);
+router.get("/current", userVerification, getScheduleRate);
 
 module.exports = router;

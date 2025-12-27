@@ -1,9 +1,6 @@
 const InterestRate = require("../models/InterestRate");
 const ScheduleRate = require("../models/ScheduleRate");
 
-/* ================= MONTHLY INTEREST RATE ================= */
-
-// ADD Monthly Rate
 exports.addInterestRate = async (req, res) => {
     try {
         const { rate, effectivityDate } = req.body;
@@ -14,7 +11,7 @@ exports.addInterestRate = async (req, res) => {
         });
 
         res.status(201).json({
-            message: "Interest rate added",
+            message: "Interest rate added successfully!",
             newRate
         });
     } catch (error) {
@@ -22,7 +19,6 @@ exports.addInterestRate = async (req, res) => {
     }
 };
 
-// GET Monthly Rates
 exports.getInterestRates = async (req, res) => {
     try {
         const rates = await InterestRate.find().sort({ effectivityDate: -1 });
@@ -32,7 +28,6 @@ exports.getInterestRates = async (req, res) => {
     }
 };
 
-// UPDATE Monthly Rate (EDIT)
 exports.updateInterestRate = async (req, res) => {
     try {
         const { id } = req.params;
@@ -49,7 +44,7 @@ exports.updateInterestRate = async (req, res) => {
         }
 
         res.json({
-            message: "Interest rate updated",
+            message: "Interest rate updated successfully!",
             updatedRate
         });
     } catch (error) {
@@ -57,9 +52,6 @@ exports.updateInterestRate = async (req, res) => {
     }
 };
 
-/* ================= SCHEDULE RATE ================= */
-
-// ADD Schedule Rate
 exports.addScheduleRates = async (req, res) => {
     try {
         const { effectivityDate, firstSchedule, secondSchedule, thirdSchedule } = req.body;
@@ -72,7 +64,7 @@ exports.addScheduleRates = async (req, res) => {
         });
 
         res.status(201).json({
-            message: "Schedule rate added",
+            message: "Schedule rate added successfully!",
             newSchedule
         });
     } catch (error) {
@@ -80,7 +72,6 @@ exports.addScheduleRates = async (req, res) => {
     }
 };
 
-// UPDATE Schedule Rate (EDIT)
 exports.updateScheduleRate = async (req, res) => {
     try {
         const { id } = req.params;
@@ -97,7 +88,7 @@ exports.updateScheduleRate = async (req, res) => {
         }
 
         res.json({
-            message: "Schedule rate updated",
+            message: "Schedule rate updated successfully!",
             updatedSchedule
         });
     } catch (error) {
@@ -105,25 +96,11 @@ exports.updateScheduleRate = async (req, res) => {
     }
 };
 
-/* ================= CURRENT RATES ================= */
-
-exports.getCurrentRates = async (req, res) => {
+exports.getScheduleRate = async (req, res) => {
     try {
-        const today = new Date();
-
-        const currentMonthly = await InterestRate
-            .findOne({ effectivityDate: { $lte: today } })
-            .sort({ effectivityDate: -1 });
-
-        const currentSchedule = await ScheduleRate
-            .findOne({ effectivityDate: { $lte: today } })
-            .sort({ effectivityDate: -1 });
-
-        res.json({
-            currentMonthly,
-            currentSchedule
-        });
+        const rates = await ScheduleRate.find().sort({ effectivityDate: -1 });
+        res.json({ rates });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-};
+}

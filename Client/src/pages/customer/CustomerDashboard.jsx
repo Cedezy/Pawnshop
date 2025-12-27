@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import HeaderCustomer from "../../components/ui/HeaderCustomer";
 import NotAllowed from "../../components/ui/NotAllowed";
-import DashboardSkeleton from "../../components/ui/DashboardSkeleton";
+import SkeletonDashboard from "../../components/ui/SkeletonDashboard";
 import axios from "../../api/axios";
 
 const CustomerDashboard = () => {
@@ -36,7 +36,7 @@ const CustomerDashboard = () => {
         <div className="h-screen flex flex-col bg-gray-50">
             <HeaderCustomer />
             <div className="flex-1 overflow-y-auto md:px-6 pb-4 md:pt-4">
-                {loading && <DashboardSkeleton />}
+                {loading && <SkeletonDashboard />}
                 {!loading && !customer && <NotAllowed />}
                 {!loading && customer && (
                     <div className="mx-auto md:max-w-7xl p-6 flex flex-col gap-6">

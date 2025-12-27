@@ -8,6 +8,7 @@ import PawnDetailModal from "../../components/modals/PawnDetailModal";
 import PawnUpdateModal from "../../components/modals/PawnUpdateModal";
 import PawnSuccessModal from "../../components/modals/PawnSuccessModal";
 import ReceiptModal from "../../components/modals/ReceiptModal";
+import SkeletonTable from "../../components/ui/SkeletonTable";
 import { shortFormatDate } from "../../utils/FormatDate";
 import { formatCurrency } from "../../utils/FormatCurrency";
 import { useRef } from 'react';
@@ -33,6 +34,7 @@ const AdminPawn = () => {
     const [showRenewModal, setShowRenewModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+    const [pawnLoading, setPawnLoading] = useState(true);
     const [successConfig, setSuccessConfig] = useState({
         open: false,
         title: "",
@@ -77,6 +79,9 @@ const AdminPawn = () => {
         } 
         catch(err){
             console.error("Error fetching pawns:", err);
+        }
+        finally{
+            setPawnLoading(false);
         }
     };
 
@@ -418,92 +423,96 @@ const AdminPawn = () => {
                                 </tr>
                             </thead>
 
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {pawns.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="9" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
+                            {pawnLoading ? (
+                                <SkeletonTable rows={8} columns={9} />
+                            ) : (
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {pawns.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No pawns yet!</h3>
+                                                    <p className="text-gray-500">Pawns will appear here once they submit a request.</p>
                                                 </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No pawns yet!</h3>
-                                                <p className="text-gray-500">Pawns will appear here once they submit a request.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : filteredPawns.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="9" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
-                                                </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
-                                                <p className="text-gray-500">Try adjusting your search keywords.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredPawns.map((p) => (
-                                        <tr
-                                            key={p._id}
-                                            className={`transition ease-in-out duration-300 ${
-                                                selectedPawn?._id === p._id ? "bg-yellow-100" : ""
-                                            } ${p.status === "Redeemed" ? "cursor-pointer hover:bg-gray-50" : "cursor-pointer hover:bg-gray-50"}`}
-                                            onClick={() => {
-                                                if (p.status !== "Redeemed") {
-                                                    setSelectedPawn(p);
-                                                }
-                                            }}
-                                            onDoubleClick={() => setDetailPawn(p)}
-                                        >
-                                            <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold whitespace-nowrap">
-                                                PAWN-{p._id.slice(-6).toUpperCase()}
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {p.customerId?.userId?.firstname} {p.customerId?.userId?.lastname}
-                                            </td>
-
-                                            <td className="px-6 py-6 text-sm text-gray-800">
-                                                {p.itemName}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                                                {formatCurrency(p.loanAmount)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                                                {formatCurrency(p.balance)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.startDate)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.maturityDate)}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                                                {shortFormatDate(p.expiryDate)}
-                                            </td>
-
-                                            <td
-                                                className={`px-6 py-4 text-sm font-semibold ${
-                                                    p.status === "Active"
-                                                        ? "text-green-600"
-                                                        : p.status === "Expired"
-                                                        ? "text-red-600"
-                                                        : "text-gray-700"
-                                                }`}
-                                            >
-                                                {p.status}
-                                            </td>
-
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
+                                    ) : filteredPawns.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
+                                                    <p className="text-gray-500">Try adjusting your search keywords.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredPawns.map((p) => (
+                                            <tr
+                                                key={p._id}
+                                                className={`transition ease-in-out duration-300 ${
+                                                    selectedPawn?._id === p._id ? "bg-yellow-100" : ""
+                                                } ${p.status === "Redeemed" ? "cursor-pointer hover:bg-gray-50" : "cursor-pointer hover:bg-gray-50"}`}
+                                                onClick={() => {
+                                                    if (p.status !== "Redeemed") {
+                                                        setSelectedPawn(p);
+                                                    }
+                                                }}
+                                                onDoubleClick={() => setDetailPawn(p)}
+                                            >
+                                                <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold whitespace-nowrap">
+                                                    PAWN-{p._id.slice(-6).toUpperCase()}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {p.customerId?.userId?.firstname} {p.customerId?.userId?.lastname}
+                                                </td>
+
+                                                <td className="px-6 py-6 text-sm text-gray-800">
+                                                    {p.itemName}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                                                    {formatCurrency(p.loanAmount)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                                                    {formatCurrency(p.balance)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.startDate)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.maturityDate)}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                                                    {shortFormatDate(p.expiryDate)}
+                                                </td>
+
+                                                <td
+                                                    className={`px-6 py-4 text-sm font-semibold ${
+                                                        p.status === "Active"
+                                                            ? "text-green-600"
+                                                            : p.status === "Expired"
+                                                            ? "text-red-600"
+                                                            : "text-gray-700"
+                                                    }`}
+                                                >
+                                                    {p.status}
+                                                </td>
+
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            )}
                         </table>
 
                         <div className="p-6 mt-10 print:block hidden">

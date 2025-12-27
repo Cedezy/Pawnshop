@@ -6,6 +6,7 @@ import { Printer, UserX } from 'lucide-react';
 import { handlePrint } from '../../utils/PrintUtils';
 import StaffModal from '../../components/modals/StaffModal';
 import { useToast } from "../../context/ToastContext"; 
+import SkeletonTable from '../../components/ui/SkeletonTable';
 
 const AdminUser = () => {
     const [staff, setStaff] = useState([]);
@@ -13,6 +14,7 @@ const AdminUser = () => {
     const [openModal, setOpenModal] = useState(false);
     const [admin, setAdmin] = useState(null);
     const [confirmAction, setConfirmAction] = useState(false);
+    const [loading, setLoading] = useState(true);
     const printRef = useRef();
     const { showToast } = useToast();
 
@@ -37,6 +39,9 @@ const AdminUser = () => {
         } 
         catch(err){
             console.error(err);
+        }
+        finally{
+            setLoading(false);
         }
     };
 
@@ -94,49 +99,78 @@ const AdminUser = () => {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-100 sticky top-0 z-10">
                                 <tr>
-                                    <th className="px-4 py-6 text-left text-xs font-medium text-gray-900 uppercase">Name</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Email</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">User Type</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Contact Number</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Address</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Last Login</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">Status</th>
+                                    <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
+                                        Full Name
+                                    </th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">
+                                        Email
+                                    </th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">
+                                        User Type
+                                    </th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">
+                                        Contact Number
+                                    </th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">
+                                        Address
+                                    </th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-900 uppercase">
+                                        Last Login
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">
+                                        Status
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {staff.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="7" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />
+                            {loading ? (
+                                <SkeletonTable rows={8} columns={7}/>
+                            ) : (
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {staff.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="7" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No staff yet!</h3>
+                                                    <p className="text-gray-500">Staff members will appear here once added.</p>
                                                 </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No staff yet!</h3>
-                                                <p className="text-gray-500">Staff members will appear here once added.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    staff.map(s => (
-                                        <tr key={s._id} className={`cursor-pointer transition ${selectedStaff?._id === s._id ? 'bg-green-100' : 'hover:bg-gray-50'}`} onClick={() => setSelectedStaff(s)}>
-                                            <td className="px-4 py-4 text-sm text-gray-800">{s.userId.firstname} {s.userId.lastname}</td>
-                                            <td className="px-4 py-4 text-sm text-gray-800">{s.userId.email}</td>
-                                            <td className="px-4 py-4 text-sm text-gray-800 capitalize">{s.userId.role}</td>
-                                            <td className="px-4 py-4 text-sm text-gray-800">{s.phone}</td>
-                                            <td className="px-4 py-4 text-sm text-gray-800">{`${s.street || ""}, ${s.barangay || ""}, ${s.city || ""}, ${s.province || ""}, ${s.zipCode || ""}`}</td>
-                                            <td className="px-4 py-4 text-sm text-gray-800">{formatDateTime(s.userId.lastLogin)}</td>
-                                            <td className="px-4 py-4">
-                                                <span className={`px-2 py-1 rounded text-xs ${s.userId.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                                    {s.userId.isActive ? 'Active' : 'Deactivated'}
-                                                </span>
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                        </tbody>
+                                    ) : (
+                                        staff.map(s => (
+                                            <tr key={s._id} className={`cursor-pointer transition ${selectedStaff?._id === s._id ? 'bg-green-100' : 'hover:bg-gray-50'}`} onClick={() => setSelectedStaff(s)}>
+                                                <td className="px-6 py-4 text-sm text-gray-800">
+                                                    {s.userId.firstname} {s.userId.lastname}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-800">
+                                                    {s.userId.email}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-800 capitalize">
+                                                    {s.userId.role}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-800">
+                                                    {s.phone}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-800">
+                                                    {`${s.street || ""}, ${s.barangay || ""}, ${s.city || ""}, ${s.province || ""}, ${s.zipCode || ""}`}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm text-gray-800">
+                                                    {formatDateTime(s.userId.lastLogin)}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-2 py-1 rounded text-xs ${s.userId.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                        {s.userId.isActive ? 'Active' : 'Deactivated'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            )}
                         </table>
 
-                        {/* Admin footer for print */}
                         {admin && (
                             <div className="p-6 mt-10 print:block hidden">
                                 <p className="text-sm text-gray-700">Prepared by: {admin.firstname} {admin.lastname}</p>

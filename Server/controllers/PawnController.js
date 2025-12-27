@@ -151,7 +151,6 @@ exports.getAllPawns = async (req, res) => {
     }
 };
 
-
 exports.addPayment = async (req, res) => {
     try {
         const { pawnId } = req.params;
@@ -449,13 +448,16 @@ exports.getMyPawns = async (req, res) => {
                 for (const p of pawn.payments) {
                     runningBalance -= p.amount;
                     const paymentReceipt = await Receipt.findById(p.receiptId);
+                    const paymentInterestRate = pawn.loanAmount
+                        ? (p.interestPaid / pawn.loanAmount) * 100
+                        : 0;
                     actions.push({
                         actionDate: p.date,
                         actionType: "Payment",
                         amount: p.amount,
                         balance: runningBalance,
                         penalty: p.penaltyPaid || 0,
-                        interestRate: pawn.interestRate,
+                        interestRate: paymentInterestRate,
                         newMaturityDate: null,
                         staff: pawn.createdBy ? `${pawn.createdBy.firstname} ${pawn.createdBy.lastname}` : "N/A",
                         receiptId: paymentReceipt?._id || null,

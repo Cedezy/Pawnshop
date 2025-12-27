@@ -6,6 +6,7 @@ import { HelpCircle } from 'lucide-react';
 import { formatDate } from '../../utils/FormatDate';
 import FAQsModal from '../../components/modals/FAQsModal';
 import { useToast } from "../../context/ToastContext"; 
+import SkeletonFAQs from '../../components/ui/SkeletonFAQs';
 
 const AdminFAQs = () => {
     const [faqs, setFaqs] = useState([]);
@@ -13,14 +14,21 @@ const AdminFAQs = () => {
     const [editId, setEditId] = useState(null);
     const [selectedFaqs, setSelectedFaqs] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(true);
     const { showToast } = useToast();
 
     const fetchFaqs = async () => {
-        try {
-            const response = await axios.get('/faqs', { withCredentials: true });
+        try{
+            const response = await axios.get('/faqs', { 
+                withCredentials: true 
+            });
             setFaqs(response.data.faqs);
-        } catch (err) {
+        } 
+        catch(err){
             console.error(err);
+        }
+        finally{
+            setLoading(false);
         }
     };
 
@@ -75,8 +83,10 @@ const AdminFAQs = () => {
                             frequently asked questions
                         </span>
                     </div>
-
-                    <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
+                    {loading ? (
+                        <SkeletonFAQs/>
+                    ) : (
+                        <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-y-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50 sticky top-0 z-10">
                                 <tr className='whitespace-nowrap'>
@@ -114,6 +124,7 @@ const AdminFAQs = () => {
                             </tbody>
                         </table>
                     </div>
+                    )}
                     <div className='flex gap-2'>
                         <button onClick={() => setShowModal(true)}
                             className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-50 ease-in-out duration-300">

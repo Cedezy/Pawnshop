@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SidebarAdmin from "../../components/ui/SidebarAdmin";
 import HeaderStaff from "../../components/ui/HeaderStaff";
-import AdminDashboardSkeleton from "../../components/ui/AdminDashboardSkeleton";
+import SkeletonDashboard from "../../components/ui/SkeletonDashboard";
 import NotAllowed from "../../components/ui/NotAllowed";
 import axios from "../../api/axios";
 import { Settings, Shield } from "lucide-react";
@@ -40,7 +40,7 @@ const AdminDashboard = () => {
                 <HeaderStaff />
 
                 <main className="flex-1 overflow-y-auto px-6 py-8">
-                    {loading && <AdminDashboardSkeleton />}
+                    {loading && <SkeletonDashboard />}
                     {!loading && !admin && <NotAllowed />}
                     {!loading && admin && (
                         <div className="max-w-6xl mx-auto space-y-6">

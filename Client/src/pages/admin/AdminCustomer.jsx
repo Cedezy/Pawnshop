@@ -251,68 +251,70 @@ const AdminCustomer = () => {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {customersLoading ? (
-                                    <SkeletonTable rows={8} columns={6} />
-                                ) : customers.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="6" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
+                            {customersLoading ? (
+                                <SkeletonTable rows={8} columns={6} />
+                            ) : (
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {customers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No customers yet!</h3>
+                                                    <p className="text-gray-500">Customers will appear here once they submit a request.</p>
                                                 </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No customers yet!</h3>
-                                                <p className="text-gray-500">Customers will appear here once they submit a request.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : filteredCustomers.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="6" className="text-center py-16">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <UserX className="w-8 h-8 text-gray-400" />                             
-                                                </div>
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
-                                                <p className="text-gray-500">Try adjusting your search keywords.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredCustomers.map(customer => (
-                                        <tr key={customer._id}
-                                            onDoubleClick={() => {                         
-                                                setSelectedUser(customer);
-                                                setShowModal(true);
-                                            }}
-                                            className={`cursor-pointer transition ${selectedUser?._id === customer._id ? 'bg-green-100' : 'hover:bg-gray-50 ease-in-out duration-300'
-                                        }`}>
-                                            <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold">
-                                                CMR-{customer._id.slice(-6).toUpperCase()}
-                                            </td>
-                                            <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
-                                                {customer.userId?.firstname} {customer.userId?.lastname}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800">
-                                                {customer.userId?.email}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-700">
-                                                {customer.phone}    
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-800">
-                                                {customer.street}, {customer.barangay}, {customer.city} {customer.province}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                                                {shortFormatDate(customer.createdAt)}    
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
+                                    ) : filteredCustomers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" className="text-center py-16">
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                        <UserX className="w-8 h-8 text-gray-400" />                             
+                                                    </div>
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No records found!</h3>
+                                                    <p className="text-gray-500">Try adjusting your search keywords.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredCustomers.map(customer => (
+                                            <tr key={customer._id}
+                                                onDoubleClick={() => {                         
+                                                    setSelectedUser(customer);
+                                                    setShowModal(true);
+                                                }}
+                                                className={`cursor-pointer transition ${selectedUser?._id === customer._id ? 'bg-green-100' : 'hover:bg-gray-50 ease-in-out duration-300'
+                                            }`}>
+                                                <td className="px-4 py-4 text-sm text-gray-800 font-mono font-semibold">
+                                                    CMR-{customer._id.slice(-6).toUpperCase()}
+                                                </td>
+                                                <td className="px-6 py-6 whitespace-nowrap text-sm text-gray-800">
+                                                    {customer.userId?.firstname} {customer.userId?.lastname}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800">
+                                                    {customer.userId?.email}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700">
+                                                    {customer.phone}    
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-800">
+                                                    {customer.street}, {customer.barangay}, {customer.city} {customer.province}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                                                    {shortFormatDate(customer.createdAt)}    
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            )}
                         </table>
                         <div className="p-6 mt-10 print:block hidden">
                             {admin && (
