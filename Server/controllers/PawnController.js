@@ -161,10 +161,7 @@ exports.addPayment = async (req, res) => {
             return res.status(404).json({ error: "Pawn not found" });
         }
 
-        // Determine payment number (1-based)
         const paymentNumber = (pawn.payments?.length || 0) + 1;
-
-        // Get the correct schedule rate for this payment
         const scheduleRate = await getScheduleInterestRate(pawn.startDate, paymentNumber);
 
         if (!scheduleRate) {
@@ -172,11 +169,7 @@ exports.addPayment = async (req, res) => {
                 error: "No active payment schedule rate found"
             });
         }
-        const interestDue = 
-        calculateMonthlyInterest(
-            pawn.balance,
-            scheduleRate
-        );
+        const interestDue = calculateMonthlyInterest(pawn.balance, scheduleRate);
 
         let remainingPayment = Number(amount);
         let interestPaid = Math.min(remainingPayment, interestDue);
@@ -443,21 +436,28 @@ exports.getMyPawns = async (req, res) => {
                 }
             }
 
-            // Payments
             if (pawn.payments?.length) {
-                for (const p of pawn.payments) {
+                for (const [index, p] of pawn.payments.entries()) {
                     runningBalance -= p.amount;
-                    const paymentReceipt = await Receipt.findById(p.receiptId);
-                    const paymentInterestRate = pawn.loanAmount
-                        ? (p.interestPaid / pawn.loanAmount) * 100
-                        : 0;
+
+                    // Fetch the actual receipt for this payment
+                    const paymentReceipt = p.receiptId
+                        ? await Receipt.findById(p.receiptId)
+                        : null;
+
+                    // Get the scheduled interest rate for display
+                    const paymentScheduleRate = await getScheduleInterestRate(
+                        pawn.startDate,
+                        index + 1
+                    );
+
                     actions.push({
                         actionDate: p.date,
                         actionType: "Payment",
                         amount: p.amount,
                         balance: runningBalance,
                         penalty: p.penaltyPaid || 0,
-                        interestRate: paymentInterestRate,
+                        interestRate: paymentScheduleRate || 0, // use schedule rate
                         newMaturityDate: null,
                         staff: pawn.createdBy ? `${pawn.createdBy.firstname} ${pawn.createdBy.lastname}` : "N/A",
                         receiptId: paymentReceipt?._id || null,
@@ -465,6 +465,7 @@ exports.getMyPawns = async (req, res) => {
                     });
                 }
             }
+
 
             // Redemption
             if (pawn.status === "Redeemed") {

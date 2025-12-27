@@ -35,10 +35,8 @@ const AdminDashboard = () => {
     return (
         <div className="flex h-screen overflow-hidden">
             <SidebarAdmin />
-
             <div className="flex flex-col flex-1">
                 <HeaderStaff />
-
                 <main className="flex-1 overflow-y-auto px-6 py-8">
                     {loading && <SkeletonDashboard />}
                     {!loading && !admin && <NotAllowed />}

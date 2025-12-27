@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const Pawn = require("../models/Pawn");
 const Receipt = require("../models/Receipt");
+const getScheduleInterestRate = require("../utils/getScheduleInterestRate");
 
 exports.createCustomer = async (req, res) => {
     try {
@@ -181,21 +182,20 @@ exports.getCustomerTransactionHistory = async (req, res) => {
             }
 
             if (pawn.payments?.length) {
-                for (const p of pawn.payments) {
+                    for (const [index, p] of pawn.payments.entries()) {
                     const paymentReceipt = await Receipt.findById(p.receiptId)
                         .populate("createdBy", "firstname lastname");
 
-                    // Calculate the schedule interest rate as % if you have loanAmount
-                    const paymentInterestRate = pawn.loanAmount
-                        ? (p.interestPaid / pawn.loanAmount) * 100
-                        : 0;
+                    const paymentNumber = index + 1;
+
+                    const scheduleRate = await getScheduleInterestRate(pawn.startDate, paymentNumber);
 
                     actions.push({
                         actionDate: p.date,
                         actionType: "Payment",
                         amount: p.amount,
                         interest: p.interestPaid || 0, 
-                        interestRate: paymentInterestRate, 
+                        interestRate: scheduleRate, 
                         newMaturityDate: null,
                         staff: paymentReceipt?.createdBy
                             ? `${paymentReceipt.createdBy.firstname} ${paymentReceipt.createdBy.lastname}`

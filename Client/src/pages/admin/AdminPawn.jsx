@@ -188,7 +188,6 @@ const AdminPawn = () => {
         }
     };
 
-
     const openSuccessWithReceipt = (receipt, title, message) => {
         setReceipt(receipt);
         setSuccessConfig({
