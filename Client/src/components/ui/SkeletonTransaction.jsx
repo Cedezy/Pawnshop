@@ -2,7 +2,7 @@ import React from "react";
 
 const SkeletonTransaction = ({ pawnItems = 2, actionsPerPawn = 3 }) => {
     return (
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="overflow-y-auto flex-1">
             <div className="space-y-8 animate-pulse">
                 {Array.from({ length: pawnItems }).map((_, pawnIndex) => (
                     <div key={pawnIndex} className="border-b border-gray-200 pb-6 last:border-b-0">
