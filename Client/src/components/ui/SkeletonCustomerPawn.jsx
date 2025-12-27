@@ -1,6 +1,6 @@
 import React from "react";
 
-const SkeletonCustomerPawn = ({ rows = 5 }) => {
+const SkeletonCustomerPawn = ({ rows = 3 }) => {
     return (
         <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden animate-pulse">
             <table className="min-w-full divide-y divide-gray-200">
@@ -46,6 +46,24 @@ const SkeletonCustomerPawn = ({ rows = 5 }) => {
                             </td>
                             <td className="px-6 py-6">
                                 <div className="h-4 bg-gray-300 rounded w-32"></div>
+                            </td>
+                            <td className="px-6 py-6">
+                                <div className="h-4 bg-gray-300 rounded w-20"></div>
+                            </td>
+                            <td className="px-6 py-6">
+                                <div className="h-4 bg-gray-300 rounded w-20"></div>
+                            </td>
+                            <td className="px-6 py-6">
+                                <div className="h-4 bg-gray-300 rounded w-20"></div>
+                            </td>
+                            <td className="px-6 py-6">
+                                <div className="h-4 bg-gray-300 rounded w-20"></div>
+                            </td>
+                            <td className="px-6 py-6">
+                                <div className="h-4 bg-gray-300 rounded w-16"></div>
+                            </td>
+                            <td className="px-6 py-6">
+                                <div className="h-4 bg-gray-300 rounded w-20"></div>
                             </td>
                         </tr>
                     ))}
