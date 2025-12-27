@@ -98,7 +98,7 @@ const AdminUser = () => {
                         <h1 className="print-title hidden">List of Staff</h1>
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-100 sticky top-0 z-10">
-                                <tr>
+                                <tr className='whitespace-nowrap'>
                                     <th className="px-6 py-6 text-left text-xs font-medium text-gray-900 uppercase">
                                         Full Name
                                     </th>
@@ -141,7 +141,7 @@ const AdminUser = () => {
                                     ) : (
                                         staff.map(s => (
                                             <tr key={s._id} className={`cursor-pointer transition ${selectedStaff?._id === s._id ? 'bg-green-100' : 'hover:bg-gray-50'}`} onClick={() => setSelectedStaff(s)}>
-                                                <td className="px-6 py-4 text-sm text-gray-800">
+                                                <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
                                                     {s.userId.firstname} {s.userId.lastname}
                                                 </td>
                                                 <td className="px-4 py-4 text-sm text-gray-800">
